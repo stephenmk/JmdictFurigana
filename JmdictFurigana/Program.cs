@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using JmdictFurigana.Business;
 using JmdictFurigana.Etl;
 using JmdictFurigana.Helpers;
@@ -9,7 +10,7 @@ namespace JmdictFurigana
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -18,11 +19,11 @@ namespace JmdictFurigana
 
             var downloader = new ResourceDownloader();
             logger.Info("Downloading the Kanjidic2 file...");
-            downloader.DownloadKanjidic();
+            await downloader.DownloadKanjidic();
             logger.Info("Downloading the Jmdict file...");
-            downloader.DownloadJmdict();
+            await downloader.DownloadJmdict();
             logger.Info("Downloading the Jmnedict file...");
-            downloader.DownloadJmnedict();
+            await downloader.DownloadJmnedict();
 
             logger.Info("Resources are now downloaded. Starting the furigana process.");
 

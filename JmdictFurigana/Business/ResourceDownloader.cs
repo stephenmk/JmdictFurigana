@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.IO.Compression;
-using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using JmdictFurigana.Helpers;
 
 namespace JmdictFurigana.Business
@@ -10,6 +11,9 @@ namespace JmdictFurigana.Business
     /// </summary>
     public class ResourceDownloader
     {
+        // HttpClient is intended to be instantiated once per application, rather than per-use
+        private static readonly HttpClient client = new HttpClient();
+
         private const string Kanjidic2Uri = "http://www.edrdg.org/kanjidic/kanjidic2.xml.gz";
 
         // Note that we use the English-only version of the Jmdict file, because it's lighter and we don't need translations
@@ -20,25 +24,25 @@ namespace JmdictFurigana.Business
         /// <summary>
         /// Downloads the Kanjidic2 XML file to its resource path.
         /// </summary>
-        public void DownloadKanjidic()
+        public async Task DownloadKanjidic()
         {
-            DownloadGzFile(Kanjidic2Uri, PathHelper.KanjiDic2Path);
+            await DownloadGzFile(Kanjidic2Uri, PathHelper.KanjiDic2Path);
         }
 
         /// <summary>
         /// Downloads the JMdict file to its resource path.
         /// </summary>
-        public void DownloadJmdict()
+        public async Task DownloadJmdict()
         {
-            DownloadGzFile(JmdictUri, PathHelper.JmDictPath);
+            await DownloadGzFile(JmdictUri, PathHelper.JmDictPath);
         }
 
         /// <summary>
         /// Downloads the JMnedict file to its resource path.
         /// </summary>
-        public void DownloadJmnedict()
+        public async Task DownloadJmnedict()
         {
-            DownloadGzFile(JmnedictUri, PathHelper.JmneDictPath);
+            await DownloadGzFile(JmnedictUri, PathHelper.JmneDictPath);
         }
 
         /// <summary>
@@ -46,11 +50,10 @@ namespace JmdictFurigana.Business
         /// </summary>
         /// <param name="uri">URI of the file to obtain.</param>
         /// <param name="targetPath">Path of the resulting file.</param>
-        private void DownloadGzFile(string uri, string targetPath)
+        private static async Task DownloadGzFile(string uri, string targetPath)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
-            using var webClient = new WebClient();
-            using var httpStream = webClient.OpenRead(uri);
+            using var httpStream = await ResourceDownloader.client.GetStreamAsync(uri);
             using var gzipStream = new GZipStream(httpStream, CompressionMode.Decompress);
             using var fileStream = new FileStream(targetPath, FileMode.Create);
             gzipStream.CopyTo(fileStream);
