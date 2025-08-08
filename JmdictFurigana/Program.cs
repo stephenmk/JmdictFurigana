@@ -19,12 +19,13 @@ namespace JmdictFurigana
 
             var downloader = new ResourceDownloader();
             logger.Info("Downloading the Kanjidic2 file...");
-            await downloader.DownloadKanjidic();
+            var t1 = downloader.DownloadKanjidic();
             logger.Info("Downloading the Jmdict file...");
-            await downloader.DownloadJmdict();
+            var t2 = downloader.DownloadJmdict();
             logger.Info("Downloading the Jmnedict file...");
-            await downloader.DownloadJmnedict();
+            var t3 = downloader.DownloadJmnedict();
 
+            await Task.WhenAll(t1, t2, t3);
             logger.Info("Resources are now downloaded. Starting the furigana process.");
 
             // Jmdict
