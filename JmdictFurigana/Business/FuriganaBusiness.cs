@@ -68,20 +68,17 @@ public class FuriganaBusiness
             ResourceSet.Load();
         }
 
-        if (Solvers == null)
-        {
-            Solvers = new List<FuriganaSolver>()
-            {
-                new KanaReadingSolver(),
-                new KanjiReadingSolver(useNanori:DictionaryFile == DictionaryFile.Jmnedict),
-                new LengthMatchSolver(),
-                new NoConsecutiveKanjiSolver(),
-                new OverrideSolver(),
-                new RepeatedKanjiSolver(),
-                new SingleCharacterSolver(),
-                new SingleKanjiSolver()
-            };
-        }
+        Solvers ??= [
+            new KanaReadingSolver(),
+            new KanjiReadingSolver(useNanori:DictionaryFile == DictionaryFile.Jmnedict),
+            new LengthMatchSolver(),
+            new NoConsecutiveKanjiSolver(),
+            new OverrideSolver(),
+            new RepeatedKanjiSolver(),
+            new SingleCharacterSolver(),
+            new SingleKanjiSolver(),
+        ];
+
         Solvers.Sort();
         Solvers.Reverse();
     }
