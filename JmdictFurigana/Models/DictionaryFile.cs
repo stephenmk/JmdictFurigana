@@ -1,8 +1,7 @@
-﻿namespace JmdictFurigana.Models
+﻿namespace JmdictFurigana.Models;
+
+public enum DictionaryFile
 {
-    public enum DictionaryFile
-    {
-        Jmdict,
-        Jmnedict
-    }
+    Jmdict,
+    Jmnedict
 }

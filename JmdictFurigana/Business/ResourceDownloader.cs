@@ -4,59 +4,58 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using JmdictFurigana.Helpers;
 
-namespace JmdictFurigana.Business
+namespace JmdictFurigana.Business;
+
+/// <summary>
+/// Downloads the dictionary files used by the program.
+/// </summary>
+public class ResourceDownloader
 {
+    // HttpClient is intended to be instantiated once per application, rather than per-use
+    private static readonly HttpClient client = new HttpClient();
+
+    private const string Kanjidic2Uri = "http://www.edrdg.org/kanjidic/kanjidic2.xml.gz";
+
+    // Note that we use the English-only version of the Jmdict file, because it's lighter and we don't need translations
+    private const string JmdictUri = "http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz";
+
+    private const string JmnedictUri = "http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz";
+
     /// <summary>
-    /// Downloads the dictionary files used by the program.
+    /// Downloads the Kanjidic2 XML file to its resource path.
     /// </summary>
-    public class ResourceDownloader
+    public async Task DownloadKanjidic()
     {
-        // HttpClient is intended to be instantiated once per application, rather than per-use
-        private static readonly HttpClient client = new HttpClient();
+        await DownloadGzFile(Kanjidic2Uri, PathHelper.KanjiDic2Path);
+    }
 
-        private const string Kanjidic2Uri = "http://www.edrdg.org/kanjidic/kanjidic2.xml.gz";
+    /// <summary>
+    /// Downloads the JMdict file to its resource path.
+    /// </summary>
+    public async Task DownloadJmdict()
+    {
+        await DownloadGzFile(JmdictUri, PathHelper.JmDictPath);
+    }
 
-        // Note that we use the English-only version of the Jmdict file, because it's lighter and we don't need translations
-        private const string JmdictUri = "http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz";
+    /// <summary>
+    /// Downloads the JMnedict file to its resource path.
+    /// </summary>
+    public async Task DownloadJmnedict()
+    {
+        await DownloadGzFile(JmnedictUri, PathHelper.JmneDictPath);
+    }
 
-        private const string JmnedictUri = "http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz";
-
-        /// <summary>
-        /// Downloads the Kanjidic2 XML file to its resource path.
-        /// </summary>
-        public async Task DownloadKanjidic()
-        {
-            await DownloadGzFile(Kanjidic2Uri, PathHelper.KanjiDic2Path);
-        }
-
-        /// <summary>
-        /// Downloads the JMdict file to its resource path.
-        /// </summary>
-        public async Task DownloadJmdict()
-        {
-            await DownloadGzFile(JmdictUri, PathHelper.JmDictPath);
-        }
-
-        /// <summary>
-        /// Downloads the JMnedict file to its resource path.
-        /// </summary>
-        public async Task DownloadJmnedict()
-        {
-            await DownloadGzFile(JmnedictUri, PathHelper.JmneDictPath);
-        }
-
-        /// <summary>
-        /// Downloads and unzips the gzipped file at the given URI, and stores it to the given path.
-        /// </summary>
-        /// <param name="uri">URI of the file to obtain.</param>
-        /// <param name="targetPath">Path of the resulting file.</param>
-        private static async Task DownloadGzFile(string uri, string targetPath)
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
-            using var httpStream = await ResourceDownloader.client.GetStreamAsync(uri);
-            using var gzipStream = new GZipStream(httpStream, CompressionMode.Decompress);
-            using var fileStream = new FileStream(targetPath, FileMode.Create);
-            gzipStream.CopyTo(fileStream);
-        }
+    /// <summary>
+    /// Downloads and unzips the gzipped file at the given URI, and stores it to the given path.
+    /// </summary>
+    /// <param name="uri">URI of the file to obtain.</param>
+    /// <param name="targetPath">Path of the resulting file.</param>
+    private static async Task DownloadGzFile(string uri, string targetPath)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
+        using var httpStream = await ResourceDownloader.client.GetStreamAsync(uri);
+        using var gzipStream = new GZipStream(httpStream, CompressionMode.Decompress);
+        using var fileStream = new FileStream(targetPath, FileMode.Create);
+        gzipStream.CopyTo(fileStream);
     }
 }

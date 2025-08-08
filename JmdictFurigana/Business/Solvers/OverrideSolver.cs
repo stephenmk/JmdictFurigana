@@ -1,33 +1,32 @@
 ﻿using JmdictFurigana.Models;
 using System.Collections.Generic;
 
-namespace JmdictFurigana.Business
+namespace JmdictFurigana.Business;
+
+public class OverrideSolver : FuriganaSolver
 {
-    public class OverrideSolver : FuriganaSolver
+    #region Constructors
+
+    public OverrideSolver()
     {
-        #region Constructors
+        Priority = 9999; // Critical hit.
+    }
 
-        public OverrideSolver()
+    #endregion
+
+    /// <summary>
+    /// Attempts to solve furigana by looking up for solutions in the override list.
+    /// </summary>
+    protected override IEnumerable<FuriganaSolution> DoSolve(FuriganaResourceSet r, VocabEntry v)
+    {
+        var solution = r.GetOverride(v);
+        if (solution != null)
         {
-            Priority = 9999; // Critical hit.
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Attempts to solve furigana by looking up for solutions in the override list.
-        /// </summary>
-        protected override IEnumerable<FuriganaSolution> DoSolve(FuriganaResourceSet r, VocabEntry v)
-        {
-            var solution = r.GetOverride(v);
-            if (solution != null)
-            {
-                yield return new FuriganaSolution()
-                    {
-                        Furigana = solution.Furigana,
-                        Vocab = v
-                    };
-            }
+            yield return new FuriganaSolution()
+                {
+                    Furigana = solution.Furigana,
+                    Vocab = v
+                };
         }
     }
 }
