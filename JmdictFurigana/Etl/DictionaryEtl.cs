@@ -15,178 +15,88 @@ namespace JmdictFurigana.Etl
     /// </summary>
     public class DictionaryEtl
     {
-        #region Constants
-
         private static readonly XNamespace XmlNs = "http://www.w3.org/XML/1998/namespace";
-
         private const string XmlNode_Entry = "entry";
         private const string XmlNode_KanjiElement = "k_ele";
-        private const string XmlNode_KanjiReading = "keb";
+        private const string XmlNode_KanjiForm = "keb";
         private const string XmlNode_ReadingElement = "r_ele";
-        private const string XmlNode_KanaReading = "reb";
+        private const string XmlNode_ReadingForm = "reb";
         private const string XmlNode_ReadingConstraint = "re_restr";
         private const string XmlNode_NoKanji = "re_nokanji";
 
-        #endregion
-
-        #region Fields
-
         private ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets the path to the XML dictionary file to be parsed.
-        /// </summary>
         public string DictionaryFilePath { get; set; }
-
-        #endregion
-
-        #region Constructors
 
         public DictionaryEtl(string dictionaryFilePath)
         {
             DictionaryFilePath = dictionaryFilePath;
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
         /// Parses the dictionary file and returns entries.
         /// </summary>
         public IEnumerable<VocabEntry> Execute()
         {
-            // Load the file as an XML document
-            XDocument xdoc;
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(File.ReadAllText(DictionaryFilePath))))
-            {
-                var settings = new XmlReaderSettings
-                {
-                    DtdProcessing = DtdProcessing.Parse,
-                    MaxCharactersFromEntities = long.MaxValue,
-                    MaxCharactersInDocument = long.MaxValue
-                };
-                using (var reader = XmlReader.Create(stream, settings))
-                {
-                    xdoc = XDocument.Load(reader);
-                }
-            }
-
-            // Load and return vocab items:
-            // Browse each vocab entry.
+            var xdoc = LoadXmlDocument();
             foreach (var xentry in xdoc.Root.Elements(XmlNode_Entry))
             {
-                var vocabList = new List<VocabEntry>();
-
-                // For each kanji element node
-                foreach (var xkanjiElement in xentry.Elements(XmlNode_KanjiElement))
+                var kanjiForms = ExtractKanjiForms(xentry);
+                if (kanjiForms.Count == 0)
+                    continue;
+                foreach (var xreadingElement in xentry.Elements(XmlNode_ReadingElement))
                 {
-                    // Parse the kanji element. The list will be expanded with new elements.
-                    // Create a new vocab with the associated writing.
-                    var vocab = new VocabEntry
-                    {
-                        KanjiReading = xkanjiElement.Element(XmlNode_KanjiReading).Value
-                    };
-
-                    // Add the created vocab to the list.
-                    vocabList.Add(vocab);
-                }
-
-                // For each kanji reading node
-                var xreadingElements = xentry.Elements(XmlNode_ReadingElement);
-                foreach (var xreadingElement in xreadingElements)
-                {
-                    // Exclude the node if it contains the no kanji node, and is not the only reading.
-                    // This is a behavior that seems to be implemented in Jisho (example word: 台詞).
-                    if (xreadingElement.HasElement(XmlNode_NoKanji) && xreadingElements.Count() > 1)
-                    {
+                    if (xreadingElement.HasElement(XmlNode_NoKanji))
                         continue;
-                    }
+                    if (xreadingElement.Elements("re_inf").Select(x => x.Value).Contains("sk"))
+                        continue;
 
-                    // Parse the reading. The list will be expanded and/or its elements filled with
-                    // the available info.
-                    ParseReading(xreadingElement, vocabList);
-                }
+                    var constraintForms = xreadingElement
+                        .Elements(XmlNode_ReadingConstraint)
+                        .Select(x => x.Value).ToList();
 
-                // Yield return all vocab entries parsed from this entry.
-                foreach (VocabEntry entry in vocabList)
-                {
-                    yield return entry;
-                }
-            }
-        }
+                    var relevantKanjiForms = constraintForms.Count > 0 ? constraintForms : kanjiForms;
+                    var reading = xreadingElement.Element(XmlNode_ReadingForm).Value;
 
-        /// <summary>
-        /// Parses a reading element node.
-        /// Updates the list with the available info.
-        /// </summary>
-        /// <param name="xreadingElement">Element to parse.</param>
-        /// <param name="vocabList">Vocab list to be updated.</param>
-        private void ParseReading(XElement xreadingElement, List<VocabEntry> vocabList)
-        {
-            // First, we have to determine the target of the reading node.
-            // Two possible cases:
-            // - Scenario 1: There were no kanji readings. In that case, the reading should
-            //   add a new vocab element which has no kanji reading.
-            // - Scenario 2: There was at least one kanji reading. In that case, the reading
-            //   node targets a set of existing vocabs. They may be filtered by kanji reading
-            //   with the reading constraint nodes.
-
-            VocabEntry[] targets;
-            if (vocabList.Count == 0)
-            {
-                // Scenario 1. Create a new kanji reading, add it to the list, and set it as target.
-                var newVocab = new VocabEntry();
-                vocabList.Add(newVocab);
-                targets = [newVocab];
-            }
-            else
-            {
-                // Scenario 2. Check constraint nodes to filter the targets.
-
-                // Get all reading constraints in an array.
-                string[] readingConstraints = xreadingElement.Elements(XmlNode_ReadingConstraint)
-                    .Select(x => x.Value).ToArray();
-
-                // Filter from the vocab list.
-                if (readingConstraints.Length > 0)
-                {
-                    targets = vocabList.Where(v => readingConstraints.Contains(v.KanjiReading)).ToArray();
-                }
-                else
-                {
-                    targets = vocabList.ToArray();
-                }
-            }
-
-            // Now that we have the target vocabs, we can get the proper information from the node.
-            string kanaReading = xreadingElement.Element(XmlNode_KanaReading).Value;
-
-            // We have the info. Now we can apply it to the targets.
-            // For each target
-            foreach (var target in targets)
-            {
-                // Set the kana reading if not already set.
-                if (string.IsNullOrEmpty(target.KanaReading))
-                {
-                    target.KanaReading = kanaReading;
-                }
-                else if (vocabList.All(v => !(v.KanjiReading == target.KanjiReading && v.KanaReading == kanaReading)))
-                {
-                    // If a target already has a kana reading, we need to create a new vocab.
-                    vocabList.Add(new VocabEntry()
+                    foreach (var kanjiForm in relevantKanjiForms)
                     {
-                        KanjiReading = target.KanjiReading,
-                        KanaReading = kanaReading
-                    });
+                        yield return new VocabEntry
+                        {
+                            KanjiReading = kanjiForm,
+                            KanaReading = reading,
+                        };
+                    }
                 }
             }
         }
 
-        #endregion
+        private XDocument LoadXmlDocument()
+        {
+            XDocument doc;
+            var settings = new XmlReaderSettings
+            {
+                DtdProcessing = DtdProcessing.Parse,
+                MaxCharactersFromEntities = long.MaxValue,
+                MaxCharactersInDocument = long.MaxValue,
+            };
+            var xmlFileTextContent = File.ReadAllText(DictionaryFilePath);
+            var bytes = Encoding.UTF8.GetBytes(xmlFileTextContent);
+            using (var stream = new MemoryStream(bytes))
+            using (var reader = XmlReader.Create(stream, settings))
+            doc = XDocument.Load(reader);
+            return doc;
+        }
+
+        private List<string> ExtractKanjiForms(XElement entry)
+        {
+            var kanjiForms = new List<string>();
+            foreach (var xkanjiElement in entry.Elements(XmlNode_KanjiElement))
+            {
+                if (xkanjiElement.Elements("ke_inf").Select(i => i.Value).Contains("sK"))
+                    continue;
+                kanjiForms.Add(xkanjiElement.Element(XmlNode_KanjiForm).Value);
+            }
+            return kanjiForms;
+        }
     }
 }
