@@ -5,32 +5,31 @@ using JmdictFurigana.Etl;
 using JmdictFurigana.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace JmdictFurigana.Tests
+namespace JmdictFurigana.Tests;
+
+[TestClass]
+public class DictionaryEtlTest
 {
-    [TestClass]
-    public class DictionaryEtlTest
+    [TestMethod]
+    public void ExecuteTest_Waruguchi_FourReadings()
     {
-        [TestMethod]
-        public void ExecuteTest_Waruguchi_FourReadings()
+        // Arrange
+        var dictionaryEtl = new DictionaryEtl(Path.Combine("Resources", "Waruguchi.xml"));
+        var wanted = new List<string>()
         {
-            // Arrange
-            var dictionaryEtl = new DictionaryEtl(Path.Combine("Resources", "Waruguchi.xml"));
-            var wanted = new List<string>()
-            {
-                "悪口|あっこう",
-                "悪口|わるくち",
-                "悪口|わるぐち",
-                "惡口|あっこう",
-                "惡口|わるくち",
-                "惡口|わるぐち",
-            };
+            "悪口|あっこう",
+            "悪口|わるくち",
+            "悪口|わるぐち",
+            "惡口|あっこう",
+            "惡口|わるくち",
+            "惡口|わるぐち",
+        };
 
-            // Act
-            var results = dictionaryEtl.Execute().ToList();
-            var resultsAsStrings = results.Select(r => r.ToString()).ToList();
+        // Act
+        var results = dictionaryEtl.Execute().ToList();
+        var resultsAsStrings = results.Select(r => r.ToString()).ToList();
 
-            // Assert
-            CollectionAssert.AreEquivalent(wanted, resultsAsStrings);
-        }
+        // Assert
+        CollectionAssert.AreEquivalent(wanted, resultsAsStrings);
     }
 }
