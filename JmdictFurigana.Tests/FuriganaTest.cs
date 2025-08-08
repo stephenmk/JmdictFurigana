@@ -14,13 +14,13 @@ namespace JmdictFurigana.Tests
         /// Downloads missing resources.
         /// </summary>
         [TestInitialize]
-        public void Initialize()
+        public async void Initialize()
         {
             var downloader = new ResourceDownloader();
             if (!File.Exists(PathHelper.KanjiDic2Path))
-                downloader.DownloadKanjidic();
+                await downloader.DownloadKanjidic();
             if (!File.Exists(PathHelper.JmDictPath))
-                downloader.DownloadJmdict();
+                await downloader.DownloadJmdict();
         }
 
         [TestMethod]
