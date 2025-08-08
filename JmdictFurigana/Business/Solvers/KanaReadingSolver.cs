@@ -32,7 +32,7 @@ namespace JmdictFurigana.Business
             /// Read the ら for 羅.
 
             string kana = v.KanaReading;
-            List<FuriganaPart> furigana = new List<FuriganaPart>();
+            var furigana = new List<FuriganaPart>();
             for (int i = 0; i < v.KanjiReading.Length; i++)
             {
                 if (kana.Length == 0)
@@ -48,11 +48,11 @@ namespace JmdictFurigana.Business
                 for (int j = v.KanjiReading.Length - 1; j >= i; j--)
                 {
                     string lookup = v.KanjiReading.Substring(i, (j - i) + 1);
-                    SpecialExpression expression = r.GetExpression(lookup);
+                    var expression = r.GetExpression(lookup);
                     if (expression != null)
                     {
                         // We found an expression.
-                        foreach (SpecialReading expressionReading in ReadingExpander.GetPotentialSpecialReadings(
+                        foreach (var expressionReading in ReadingExpander.GetPotentialSpecialReadings(
                             expression, i == 0, j == v.KanjiReading.Length - 1))
                         {
                             if (kana.Length >= expressionReading.KanaReading.Length

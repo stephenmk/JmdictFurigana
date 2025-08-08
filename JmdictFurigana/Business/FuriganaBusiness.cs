@@ -128,7 +128,7 @@ namespace JmdictFurigana
 
         private FuriganaSolutionSet Process(VocabEntry v)
         {
-            FuriganaSolutionSet solutionSet = new FuriganaSolutionSet(v);
+            var solutionSet = new FuriganaSolutionSet(v);
 
             int priority = Solvers.First().Priority;
             foreach (FuriganaSolver solver in Solvers)

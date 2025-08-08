@@ -43,7 +43,7 @@ namespace JmdictFurigana.Etl
         public IEnumerable<Kanji> Execute()
         {
             // Load the supplement file.
-            List<Kanji> supplementaryKanji = new List<Kanji>();
+            var supplementaryKanji = new List<Kanji>();
             foreach (string line in File.ReadAllLines(PathHelper.SupplementaryKanjiPath))
             {
                 if (string.IsNullOrWhiteSpace(line) || line.First() == ';')
@@ -66,24 +66,23 @@ namespace JmdictFurigana.Etl
             XDocument xdoc = XDocument.Load(PathHelper.KanjiDic2Path);
 
             // Browse kanji nodes.
-            foreach (XElement xkanji in xdoc.Root.Elements(XmlNode_Character))
+            foreach (var xkanji in xdoc.Root.Elements(XmlNode_Character))
             {
-                // For each kanji node, read values.
-                Kanji kanji = new Kanji();
-
-                // Read the kanji character.
-                kanji.Character = xkanji.Element(XmlNode_Literal).Value.First();
+                var kanji = new Kanji
+                {
+                    Character = xkanji.Element(XmlNode_Literal).Value.First()
+                };
 
                 // In the reading/meaning node...
-                XElement xreadingMeaning = xkanji.Element(XmlNode_ReadingMeaning);
+                var xreadingMeaning = xkanji.Element(XmlNode_ReadingMeaning);
                 if (xreadingMeaning != null)
                 {
                     // Browse the reading group...
-                    XElement xrmGroup = xreadingMeaning.Element(XmlNode_ReadingMeaningGroup);
+                    var xrmGroup = xreadingMeaning.Element(XmlNode_ReadingMeaningGroup);
                     if (xrmGroup != null)
                     {
                         // Read the readings and add them to the readings of the kanji.
-                        foreach (XElement xreading in xrmGroup.Elements(XmlNode_Reading)
+                        foreach (var xreading in xrmGroup.Elements(XmlNode_Reading)
                             .Where(x => x.Attribute(XmlAttribute_ReadingType).Value == XmlAttributeValue_OnYomiReading
                                 || x.Attribute(XmlAttribute_ReadingType).Value == XmlAttributeValue_KunYomiReading))
                         {
@@ -93,7 +92,7 @@ namespace JmdictFurigana.Etl
                 }
 
                 // See if there's a supplementary entry for this kanji.
-                Kanji supp = supplementaryKanji.FirstOrDefault(k => k.Character == kanji.Character);
+                var supp = supplementaryKanji.FirstOrDefault(k => k.Character == kanji.Character);
                 if (supp != null)
                 {
                     // Supplementary entry found. Remove it from the list and add its readings to our current entry.
@@ -112,9 +111,9 @@ namespace JmdictFurigana.Etl
             }
 
             // Return the remaining supplementary kanji as new kanji.
-            foreach (Kanji k in supplementaryKanji)
+            foreach (var kanji in supplementaryKanji)
             {
-                yield return k;
+                yield return kanji;
             }
         }
 

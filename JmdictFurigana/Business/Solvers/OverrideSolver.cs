@@ -19,7 +19,7 @@ namespace JmdictFurigana.Business
         /// </summary>
         protected override IEnumerable<FuriganaSolution> DoSolve(FuriganaResourceSet r, VocabEntry v)
         {
-            FuriganaSolution solution = r.GetOverride(v);
+            var solution = r.GetOverride(v);
             if (solution != null)
             {
                 yield return new FuriganaSolution()

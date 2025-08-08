@@ -29,15 +29,15 @@ namespace JmdictFurigana
             logger.Info("Resources are now downloaded. Starting the furigana process.");
 
             // Jmdict
-            DictionaryEtl jmdictEtl = new DictionaryEtl(PathHelper.JmDictPath);
-            FuriganaBusiness furiganaJmdict = new FuriganaBusiness(DictionaryFile.Jmdict);
-            FuriganaFileWriter jmdictWriter = new FuriganaFileWriter(PathHelper.JmdictOutFilePath);
+            var jmdictEtl = new DictionaryEtl(PathHelper.JmDictPath);
+            var furiganaJmdict = new FuriganaBusiness(DictionaryFile.Jmdict);
+            var jmdictWriter = new FuriganaFileWriter(PathHelper.JmdictOutFilePath);
             jmdictWriter.Write(furiganaJmdict.Execute(jmdictEtl.Execute()));
 
             // Jmnedict
-            DictionaryEtl jmnedictEtl = new DictionaryEtl(PathHelper.JmneDictPath);
-            FuriganaBusiness furiganaJmnedict = new FuriganaBusiness(DictionaryFile.Jmnedict);
-            FuriganaFileWriter jmnedictWriter = new FuriganaFileWriter(PathHelper.JmnedictOutFilePath);
+            var jmnedictEtl = new DictionaryEtl(PathHelper.JmneDictPath);
+            var furiganaJmnedict = new FuriganaBusiness(DictionaryFile.Jmnedict);
+            var jmnedictWriter = new FuriganaFileWriter(PathHelper.JmnedictOutFilePath);
             jmnedictWriter.Write(furiganaJmnedict.Execute(jmnedictEtl.Execute()));
 
             sw.Stop();

@@ -108,9 +108,9 @@ namespace JmdictFurigana.Tests
 
         public void Test_Furigana(string kanjiReading, string kanaReading, string expectedFurigana)
         {
-            VocabEntry v = new VocabEntry(kanjiReading, kanaReading);
-            FuriganaBusiness business = new FuriganaBusiness(DictionaryFile.Jmdict);
-            FuriganaSolutionSet result = business.Execute(v);
+            var v = new VocabEntry(kanjiReading, kanaReading);
+            var business = new FuriganaBusiness(DictionaryFile.Jmdict);
+            var result = business.Execute(v);
 
             if (result.GetSingleSolution() == null)
             {

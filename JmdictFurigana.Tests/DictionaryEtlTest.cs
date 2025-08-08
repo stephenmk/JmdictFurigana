@@ -14,20 +14,20 @@ namespace JmdictFurigana.Tests
         public void ExecuteTest_Waruguchi_FourReadings()
         {
             // Arrange
-            DictionaryEtl dictionaryEtl = new DictionaryEtl(Path.Combine("Resources", "Waruguchi.xml"));
-            List<string> wanted = new List<string>()
+            var dictionaryEtl = new DictionaryEtl(Path.Combine("Resources", "Waruguchi.xml"));
+            var wanted = new List<string>()
             {
                 "悪口|あっこう",
                 "悪口|わるくち",
                 "悪口|わるぐち",
                 "惡口|あっこう",
                 "惡口|わるくち",
-                "惡口|わるぐち"
+                "惡口|わるぐち",
             };
 
             // Act
-            List<VocabEntry> results = dictionaryEtl.Execute().ToList();
-            List<string> resultsAsStrings = results.Select(r => r.ToString()).ToList();
+            var results = dictionaryEtl.Execute().ToList();
+            var resultsAsStrings = results.Select(r => r.ToString()).ToList();
 
             // Assert
             CollectionAssert.AreEquivalent(wanted, resultsAsStrings);

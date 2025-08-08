@@ -64,10 +64,12 @@ namespace JmdictFurigana.Etl
             XDocument xdoc;
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(File.ReadAllText(DictionaryFilePath))))
             {
-                var settings = new XmlReaderSettings();
-                settings.DtdProcessing = DtdProcessing.Parse;
-                settings.MaxCharactersFromEntities = long.MaxValue;
-                settings.MaxCharactersInDocument = long.MaxValue;
+                var settings = new XmlReaderSettings
+                {
+                    DtdProcessing = DtdProcessing.Parse,
+                    MaxCharactersFromEntities = long.MaxValue,
+                    MaxCharactersInDocument = long.MaxValue
+                };
                 using (var reader = XmlReader.Create(stream, settings))
                 {
                     xdoc = XDocument.Load(reader);
@@ -76,17 +78,19 @@ namespace JmdictFurigana.Etl
 
             // Load and return vocab items:
             // Browse each vocab entry.
-            foreach (XElement xentry in xdoc.Root.Elements(XmlNode_Entry))
+            foreach (var xentry in xdoc.Root.Elements(XmlNode_Entry))
             {
-                List<VocabEntry> vocabList = new List<VocabEntry>();
+                var vocabList = new List<VocabEntry>();
 
                 // For each kanji element node
-                foreach (XElement xkanjiElement in xentry.Elements(XmlNode_KanjiElement))
+                foreach (var xkanjiElement in xentry.Elements(XmlNode_KanjiElement))
                 {
                     // Parse the kanji element. The list will be expanded with new elements.
                     // Create a new vocab with the associated writing.
-                    VocabEntry vocab = new VocabEntry();
-                    vocab.KanjiReading = xkanjiElement.Element(XmlNode_KanjiReading).Value;
+                    var vocab = new VocabEntry
+                    {
+                        KanjiReading = xkanjiElement.Element(XmlNode_KanjiReading).Value
+                    };
 
                     // Add the created vocab to the list.
                     vocabList.Add(vocab);
@@ -94,7 +98,7 @@ namespace JmdictFurigana.Etl
 
                 // For each kanji reading node
                 var xreadingElements = xentry.Elements(XmlNode_ReadingElement);
-                foreach (XElement xreadingElement in xreadingElements)
+                foreach (var xreadingElement in xreadingElements)
                 {
                     // Exclude the node if it contains the no kanji node, and is not the only reading.
                     // This is a behavior that seems to be implemented in Jisho (example word: 台詞).
@@ -133,12 +137,12 @@ namespace JmdictFurigana.Etl
             //   with the reading constraint nodes.
 
             VocabEntry[] targets;
-            if (!vocabList.Any())
+            if (vocabList.Count == 0)
             {
                 // Scenario 1. Create a new kanji reading, add it to the list, and set it as target.
-                VocabEntry newVocab = new VocabEntry();
+                var newVocab = new VocabEntry();
                 vocabList.Add(newVocab);
-                targets = new VocabEntry[] { newVocab };
+                targets = [newVocab];
             }
             else
             {
@@ -149,7 +153,7 @@ namespace JmdictFurigana.Etl
                     .Select(x => x.Value).ToArray();
 
                 // Filter from the vocab list.
-                if (readingConstraints.Any())
+                if (readingConstraints.Length > 0)
                 {
                     targets = vocabList.Where(v => readingConstraints.Contains(v.KanjiReading)).ToArray();
                 }
@@ -164,7 +168,7 @@ namespace JmdictFurigana.Etl
 
             // We have the info. Now we can apply it to the targets.
             // For each target
-            foreach (VocabEntry target in targets)
+            foreach (var target in targets)
             {
                 // Set the kana reading if not already set.
                 if (string.IsNullOrEmpty(target.KanaReading))
