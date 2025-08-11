@@ -68,11 +68,10 @@ public static class ReadingCutter
                 input = input.Remove(0, 1);
 
                 // Performance fix. Check the characters to see if it is worth going on.
-                if ((firstCut.Length == 1 && ImpossibleCutStart.Contains(firstCut.First()))
-                    || (firstCut.Length == 2 && KanaHelper.IsAllKatakana(firstCut)))
-                {
+                if (firstCut.Length == 1 && ImpossibleCutStart.Contains(firstCut.First()))
                     break;
-                }
+                if (firstCut.Length == 2 && KanaHelper.IsAllKatakana(firstCut))
+                    break;
 
                 // Recursively call this method with our input (keep in mind its first character has been removed)
                 // and with one less cut, because our currentString is the first cut in our context.

@@ -27,7 +27,7 @@ public static class ReadingCombiner
         // Recursion exit conditions.
         if (!solutions.Where(s => s.StartsWith(prefix)).Any())
         {
-            return new List<string>();
+            return [];
         }
         if (readings.Count == 1)
         {
@@ -37,9 +37,9 @@ public static class ReadingCombiner
         }
 
         // Recursion general behavior.
-        List<string> output = new List<string>();
+        var output = new List<string>();
         // Take the first reading list.
-        List<string> firstReadingList = readings.First();
+        var firstReadingList = readings.First();
         foreach (string reading in firstReadingList)
         {
             // For each reading of that first list, create a matching prefix and

@@ -77,15 +77,15 @@ public class FuriganaResourceSet
             VocabEntry v = new(kanjiReading, kanaReading);
 
             // Read the solution if it is explicitly written. Compute it otherwise.
-            FuriganaSolution solution = split.Length == 3 ?
+            var solution = split.Length == 3 ?
                 FuriganaSolution.Parse(split[2], v)
                 : new FuriganaSolution(v, new FuriganaPart(kanaReading, 0, kanjiReading.Length - 1));
 
             // Add the special reading or special expression.
             var specialReading = new SpecialReading(kanaReading, solution);
-            if (_specialExpressions.ContainsKey(kanjiReading))
+            if (_specialExpressions.TryGetValue(kanjiReading, out SpecialExpression specExp))
             {
-                _specialExpressions[kanjiReading].Readings.Add(specialReading);
+                specExp.Readings.Add(specialReading);
             }
             else
             {
@@ -99,9 +99,9 @@ public class FuriganaResourceSet
     /// </summary>
     private void LoadKanjiDictionary()
     {
-        _kanjiDictionary = new Dictionary<char, Kanji>();
-        KanjiEtl etl = new KanjiEtl();
-        foreach (Kanji kanji in etl.Execute())
+        _kanjiDictionary = [];
+        var etl = new KanjiEtl();
+        foreach (var kanji in etl.Execute())
         {
             AddKanjiEntry(kanji);
         }
@@ -110,20 +110,19 @@ public class FuriganaResourceSet
     /// <summary>
     /// Adds or merge a kanji to the kanji dictionary.
     /// </summary>
-    /// <param name="k">Kanji to add or merge.</param>
-    private void AddKanjiEntry(Kanji k)
+    /// <param name="newKanji">Kanji to add or merge.</param>
+    private void AddKanjiEntry(Kanji newKanji)
     {
-        if (_kanjiDictionary.ContainsKey(k.Character))
+        if (_kanjiDictionary.TryGetValue(newKanji.Character, out Kanji kanji))
         {
-            _kanjiDictionary[k.Character].Readings.AddRange(k.Readings);
-            _kanjiDictionary[k.Character].Readings = _kanjiDictionary[k.Character].Readings.Distinct().ToList();
-
-            _kanjiDictionary[k.Character].ReadingsWithNanori.AddRange(k.ReadingsWithNanori);
-            _kanjiDictionary[k.Character].ReadingsWithNanori = _kanjiDictionary[k.Character].ReadingsWithNanori.Distinct().ToList();
+            kanji.Readings.AddRange(newKanji.Readings);
+            kanji.Readings = kanji.Readings.Distinct().ToList();
+            kanji.ReadingsWithNanori.AddRange(newKanji.ReadingsWithNanori);
+            kanji.ReadingsWithNanori = kanji.ReadingsWithNanori.Distinct().ToList();
         }
         else
         {
-            _kanjiDictionary.Add(k.Character, k);
+            _kanjiDictionary.Add(newKanji.Character, newKanji);
         }
     }
 
@@ -138,7 +137,7 @@ public class FuriganaResourceSet
     /// <returns>The kanji matching the given character, or null if it does not exist.</returns>
     public Kanji GetKanji(char c)
     {
-        return _kanjiDictionary.ContainsKey(c) ? _kanjiDictionary[c] : null;
+        return _kanjiDictionary.TryGetValue(c, out Kanji kanji) ? kanji : null;
     }
 
     /// <summary>
@@ -148,7 +147,7 @@ public class FuriganaResourceSet
     /// <returns>The expression matching the given string, or null if it does not exist.</returns>
     public SpecialExpression GetExpression(string s)
     {
-        return _specialExpressions.ContainsKey(s) ? _specialExpressions[s] : null;
+        return _specialExpressions.TryGetValue(s, out SpecialExpression exp) ? exp : null;
     }
 
     /// <summary>
@@ -159,7 +158,7 @@ public class FuriganaResourceSet
     public FuriganaSolution GetOverride(VocabEntry v)
     {
         string s = v.ToString();
-        return _overrideList.ContainsKey(s) ? _overrideList[s] : null;
+        return _overrideList.TryGetValue(s, out FuriganaSolution sol) ? sol : null;
     }
 
     #endregion

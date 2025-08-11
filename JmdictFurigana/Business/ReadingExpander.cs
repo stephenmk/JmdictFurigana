@@ -87,11 +87,10 @@ public static class ReadingExpander
                 output.Add(dotSplit[0]);
                 output.Add(r.Replace(".", string.Empty));
 
-                if (AfterDotKunYomiTransformDictionary.ContainsKey(dotSplit[1]))
+                if (AfterDotKunYomiTransformDictionary.TryGetValue(dotSplit[1], out string newTerm))
                 {
-                    string newTerm = AfterDotKunYomiTransformDictionary[dotSplit[1]];
                     string newReading = r.Replace(".", string.Empty);
-                    newReading = newReading.Substring(0, newReading.Length - dotSplit[1].Length);
+                    newReading = newReading[..^dotSplit[1].Length];
                     newReading += newTerm;
                     output.Add(newReading);
                 }
@@ -100,7 +99,7 @@ public static class ReadingExpander
                 {
                     // Add variant without the ending る.
                     string newReading = r.Replace(".", string.Empty);
-                    newReading = newReading.Substring(0, newReading.Length - 1);
+                    newReading = newReading[..^1];
                     output.Add(newReading);
                 }
             }
@@ -146,7 +145,7 @@ public static class ReadingExpander
             {
                 if (SmallTsuRendakuList.Contains(r.KanaReading.Last()))
                 {
-                    string newKanaReading = r.KanaReading.Substring(0, r.KanaReading.Length - 1) + "っ";
+                    string newKanaReading = r.KanaReading[..^1] + "っ";
                     var newReading = new SpecialReading(newKanaReading, new FuriganaSolution(r.Furigana.Vocab,
                         r.Furigana.Furigana.Clone()));
 
@@ -168,18 +167,18 @@ public static class ReadingExpander
             var add = new List<SpecialReading>();
             foreach (var r in output)
             {
-                if (RendakuDictionary.ContainsKey(r.KanaReading.First()))
+                if (RendakuDictionary.TryGetValue(r.KanaReading.First(), out char[] rendakuChars))
                 {
-                    foreach (char ren in RendakuDictionary[r.KanaReading.First()])
+                    foreach (var renChar in rendakuChars)
                     {
-                        string newKanaReading = ren.ToString() + r.KanaReading.Substring(1);
+                        var newKanaReading = renChar + r.KanaReading[1..];
                         var newReading = new SpecialReading(newKanaReading, new FuriganaSolution(r.Furigana.Vocab,
                             r.Furigana.Furigana.Clone()));
 
                         var affectedParts = newReading.Furigana.GetPartsForIndex(0);
                         foreach (var part in affectedParts)
                         {
-                            part.Value = ren.ToString() + part.Value.Substring(1);
+                            part.Value = renChar + part.Value[1..];
                         }
                         add.Add(newReading);
                     }
@@ -193,11 +192,11 @@ public static class ReadingExpander
     private static List<string> GetSmallTsuRendaku(List<string> readings)
     {
         var addedOutput = new List<string>();
-        foreach (string r in readings)
+        foreach (var reading in readings)
         {
-            if (SmallTsuRendakuList.Contains(r.Last()))
+            if (SmallTsuRendakuList.Contains(reading.Last()))
             {
-                addedOutput.Add(r.Substring(0, r.Length - 1) + "っ");
+                addedOutput.Add(reading[..^1] + "っ");
             }
         }
 
@@ -207,13 +206,13 @@ public static class ReadingExpander
     private static List<string> GetAllRendaku(List<string> readings)
     {
         var rendakuOutput = new List<string>();
-        foreach (string r in readings)
+        foreach (var reading in readings)
         {
-            if (RendakuDictionary.ContainsKey(r.First()))
+            if (RendakuDictionary.TryGetValue(reading.First(), out char[] rendakuChars))
             {
-                foreach (char ren in RendakuDictionary[r.First()])
+                foreach (var renChar in rendakuChars)
                 {
-                    rendakuOutput.Add(ren.ToString() + r.Substring(1, r.Length - 1));
+                    rendakuOutput.Add(renChar + reading[1..]);
                 }
             }
         }
