@@ -10,7 +10,7 @@ namespace JmdictFurigana.Tests;
 public class DictionaryEtlTest
 {
     [TestMethod]
-    public void ExecuteTest_Waruguchi_FourReadings()
+    public void ExecuteTestWaruguchiFourReadings()
     {
         // Arrange
         var dictionaryEtl = new DictionaryEtl(Path.Combine("Resources", "Waruguchi.xml"));

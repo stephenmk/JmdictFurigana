@@ -29,18 +29,12 @@ public class KanjiEtl
 
     #endregion
 
-    #region Fields
-
-    private ILogger _logger = LogManager.GetCurrentClassLogger();
-
-    #endregion
-
     #region Methods
 
     /// <summary>
     /// Reads and returns Kanji models.
     /// </summary>
-    public IEnumerable<Kanji> Execute()
+    public static IEnumerable<Kanji> Execute()
     {
         var supplementaryKanjis = SupplementaryKanjis();
 
@@ -107,8 +101,8 @@ public class KanjiEtl
             var kanji = new Kanji()
             {
                 Character = c,
-                Readings = readings.ToList(),
-                ReadingsWithNanori = readings.ToList(),
+                Readings = [.. readings],
+                ReadingsWithNanori = [.. readings],
                 IsRealKanji = false
             };
             supplementaryKanjis.Add(kanji);

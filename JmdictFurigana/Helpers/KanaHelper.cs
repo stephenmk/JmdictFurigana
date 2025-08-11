@@ -7,8 +7,8 @@ public static class KanaHelper
 {
     #region Fields
 
-    private static readonly char[] KatakanaDictionary = new char[]
-    {
+    private static readonly char[] KatakanaDictionary =
+    [
         'ッ','チ','シ','ツ','ヅ','ヂ','ヮ','ャ','ィ','ュ','ェ','ョ','カ',
         'キ','ク','ケ','コ','サ','ス','セ','ソ','タ','テ','ト','ナ','ニ',
         'ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ',
@@ -16,10 +16,10 @@ public static class KanaHelper
         'ゲ','ゴ','ジ','ダ','デ','ド','バ','ビ','ブ','ベ','ボ','パ','ピ',
         'プ','ペ','ポ','ザ','ズ','ゼ','ゾ','ァ','ィ','ゥ','ェ','ォ','ン',
         'ア','イ','ウ','エ','オ','ー','ヴ','・','、','。','ヱ','ヰ'
-    };
+    ];
 
-    private static readonly char[] HiraganaDictionary = new char[]
-    {
+    private static readonly char[] HiraganaDictionary =
+    [
         'っ','ち','し','つ','づ','ぢ','ゎ','ゃ','ぃ','ゅ','ぇ','ょ','か',
         'き','く','け','こ','さ','す','せ','そ','た','て','と','な','に',
         'ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も',
@@ -27,7 +27,7 @@ public static class KanaHelper
         'げ','ご','じ','だ','で','ど','ば','び','ぶ','べ','ぼ','ぱ','ぴ',
         'ぷ','ぺ','ぽ','ざ','ず','ぜ','ぞ','ぁ','ぃ','ぅ','ぇ','ぉ','ん',
         'あ','い','う','え','お','ー','・','、','。','ゑ','ゐ'
-    };
+    ];
 
     #endregion
 
@@ -583,11 +583,11 @@ public static class KanaHelper
         kana = kana.Replace("ょ", "yo");
 
         // Replace the double vowels.
-        Regex doubleKatakanaVowelRegex = new Regex("([aoiueAOIUE])ー", options);
+        var doubleKatakanaVowelRegex = new Regex("([aoiueAOIUE])ー", options);
         kana = doubleKatakanaVowelRegex.Replace(kana, "$1$1");
 
         // Replace the double consonants.
-        Regex doubleConsonnantRegex = new Regex("[ッっ]([a-zA-Z])", options);
+        var doubleConsonnantRegex = new Regex("[ッっ]([a-zA-Z])", options);
         kana = doubleConsonnantRegex.Replace(kana, "$1$1");
 
         // Replace the double consonant markers if any is left.
@@ -613,16 +613,16 @@ public static class KanaHelper
             return null;
         }
 
-        RegexOptions options = RegexOptions.CultureInvariant | RegexOptions.Multiline;
+        var options = RegexOptions.CultureInvariant | RegexOptions.Multiline;
 
         // Replace the double vowels for katakana.
-        Regex doubleVowelRegex = new Regex("([AOIUE])\\1", options);
+        var doubleVowelRegex = new Regex("([AOIUE])\\1", options);
         romaji = doubleVowelRegex.Replace(romaji, "$1ー");
 
         // Replace the double consonants.
-        Regex doubleKatakanaConsonnantRegex = new Regex("([BCDFGHJKLMPQRSTVWXZ])\\1", options);
+        var doubleKatakanaConsonnantRegex = new Regex("([BCDFGHJKLMPQRSTVWXZ])\\1", options);
         romaji = doubleKatakanaConsonnantRegex.Replace(romaji, "ッ$1");
-        Regex doubleHiraganaConsonnantRegex = new Regex("([bcdfghjklmpqrstvwxz])\\1", options);
+        var doubleHiraganaConsonnantRegex = new Regex("([bcdfghjklmpqrstvwxz])\\1", options);
         romaji = doubleHiraganaConsonnantRegex.Replace(romaji, "っ$1");
 
         // Then, replace - by ー.

@@ -11,12 +11,6 @@ namespace JmdictFurigana.Business;
 /// </summary>
 public class FuriganaBusiness
 {
-    #region Fields
-
-    private ILogger _logger = LogManager.GetCurrentClassLogger();
-
-    #endregion
-
     #region Properties
 
     /// <summary>
@@ -104,17 +98,17 @@ public class FuriganaBusiness
         }
 
         FuriganaSolutionSet result = Process(v);
-        if (!result.Any() && v.KanjiReading.StartsWith("御"))
+        if (!result.Any() && v.KanjiReading.StartsWith('御'))
         {
             // When a word starts with 御 (honorific, often used), try to override the
             // result by replacing it with an お or a ご. It will sometimes bring a
             // result where the kanji form wouldn't.
 
-            result = Process(new VocabEntry(v.KanaReading, "お" + v.KanjiReading.Substring(1)));
+            result = Process(new VocabEntry(v.KanaReading, "お" + v.KanjiReading[1..]));
 
             if (!result.Any())
             {
-                result = Process(new VocabEntry(v.KanaReading, "ご" + v.KanjiReading.Substring(1)));
+                result = Process(new VocabEntry(v.KanaReading, "ご" + v.KanjiReading[1..]));
             }
 
             result.Vocab = v;

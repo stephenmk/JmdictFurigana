@@ -7,29 +7,19 @@ namespace JmdictFurigana.Models;
 /// <summary>
 /// Contains a set of furigana solutions that solves a vocab entry.
 /// </summary>
-public class FuriganaSolutionSet
+public class FuriganaSolutionSet(VocabEntry vocab)
 {
     #region Properties
 
     /// <summary>
     /// Gets or sets the solutions of this set.
     /// </summary>
-    public List<FuriganaSolution> Solutions { get; set; }
+    public List<FuriganaSolution> Solutions { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the vocab associated with this solution set.
     /// </summary>
-    public VocabEntry Vocab { get; set; }
-
-    #endregion
-
-    #region Constructors
-
-    public FuriganaSolutionSet(VocabEntry vocab)
-    {
-        Vocab = vocab;
-        Solutions = new List<FuriganaSolution>();
-    }
+    public VocabEntry Vocab { get; set; } = vocab;
 
     #endregion
 
@@ -78,12 +68,12 @@ public class FuriganaSolutionSet
 
     public override string ToString()
     {
-        if (!Solutions.Any())
+        if (Solutions.Count == 0)
         {
             return "???";
         }
 
-        StringBuilder output = new StringBuilder();
+        var output = new StringBuilder();
         for (int i = 0; i < Solutions.Count; i++)
         {
             FuriganaSolution a = Solutions[i];
@@ -96,17 +86,13 @@ public class FuriganaSolutionSet
                 output.Append(a.ToString());
             }
         }
-
         return output.ToString();
     }
 
     /// <summary>
     /// Gets a value indicating if the set contains at least one solution.
     /// </summary>
-    public bool Any()
-    {
-        return Solutions.Any();
-    }
+    public bool Any() => Solutions.Count != 0;
 
     /// <summary>
     /// Gets the single solution if there is only one solution, or null in

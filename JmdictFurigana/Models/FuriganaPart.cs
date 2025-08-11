@@ -49,7 +49,6 @@ public class FuriganaPart : IComparable<FuriganaPart>, ICloneable
         {
             return string.Format("{0}:{1}", StartIndex, Value);
         }
-
         return string.Format("{0}-{1}:{2}", StartIndex, EndIndex, Value);
     }
 
@@ -60,15 +59,13 @@ public class FuriganaPart : IComparable<FuriganaPart>, ICloneable
 
     public override bool Equals(object obj)
     {
-        FuriganaPart other = obj as FuriganaPart;
-        if (other != null)
+        if (obj is FuriganaPart other)
         {
             // Compare both furigana parts.
             return StartIndex == other.StartIndex
                 && EndIndex == other.EndIndex
                 && Value == other.Value;
         }
-
         return base.Equals(obj);
     }
 

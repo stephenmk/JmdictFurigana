@@ -14,7 +14,7 @@ namespace JmdictFurigana.Business;
 /// <summary>
 /// Writes the furigana file.
 /// </summary>
-class FuriganaFileWriter
+class FuriganaFileWriter(string outputPath)
 {
     /// <summary>
     /// Gets or sets the value defining whether to write or not words for which a valid
@@ -22,23 +22,19 @@ class FuriganaFileWriter
     /// </summary>
     public bool WriteUnsuccessfulWords { get; set; }
 
-    public HashSet<string> AlreadyWritten { get; set; } = new HashSet<string>();
+    public HashSet<string> AlreadyWritten { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the path where the file is written.
     /// </summary>
-    public string OutputPath { get; set; }
-
-    public FuriganaFileWriter(string outputPath)
-    {
-        OutputPath = outputPath;
-    }
+    public string OutputPath { get; set; } = outputPath;
 
     public void Write(IEnumerable<FuriganaSolutionSet> solutions)
     {
-        int success = 0, total = 0;
+        int success = 0;
+        int total = 0;
         var logger = LogManager.GetCurrentClassLogger();
-        DateTime start = DateTime.Now;
+        var start = DateTime.Now;
 
         string jsonFileName = $"{Path.GetFileNameWithoutExtension(OutputPath)}.json";
 
@@ -49,9 +45,9 @@ class FuriganaFileWriter
             jsonWriter.WriteStartArray();
             var jsonSerializer = new JsonSerializer();
             jsonSerializer.Converters.Add(new FuriganaSolutionJsonSerializer());
-            foreach (FuriganaSolutionSet solution in solutions)
+            foreach (var solution in solutions)
             {
-                FuriganaSolution singleSolution = solution.GetSingleSolution();
+                var singleSolution = solution.GetSingleSolution();
 
                 if (solution.Any())
                 {
@@ -105,11 +101,9 @@ class FuriganaFileWriter
             tarStream.Position = 0;
 
             // Compress the .tar file in the MemoryStream directly into a .tar.gz file
-            using (var gzFileStream = File.OpenWrite($"{jsonFileName}.tar.gz"))
-            using (var gzStream = new GZipStream(gzFileStream, CompressionMode.Compress))
-            {
-                tarStream.CopyTo(gzStream);
-            }
+            using var gzFileStream = File.OpenWrite($"{jsonFileName}.tar.gz");
+            using var gzStream = new GZipStream(gzFileStream, CompressionMode.Compress);
+            tarStream.CopyTo(gzStream);
         }
 
         TimeSpan duration = DateTime.Now - start;

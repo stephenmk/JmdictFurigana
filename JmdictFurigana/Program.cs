@@ -17,11 +17,10 @@ public class Program
         var logger = LogManager.GetCurrentClassLogger();
         logger.Info("Starting.");
 
-        var downloader = new ResourceDownloader();
         logger.Info("Downloading the Kanjidic2, Jmdict, and Jmnedict files...");
-        var t1 = downloader.DownloadKanjidic();
-        var t2 = downloader.DownloadJmdict();
-        var t3 = downloader.DownloadJmnedict();
+        var t1 = ResourceDownloader.Kanjidic();
+        var t2 = ResourceDownloader.Jmdict();
+        var t3 = ResourceDownloader.Jmnedict();
 
         await Task.WhenAll(t1, t2, t3);
         logger.Info("Resources are now downloaded. Starting the furigana process.");

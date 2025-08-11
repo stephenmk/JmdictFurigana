@@ -8,19 +8,19 @@ namespace JmdictFurigana.Models;
 /// <summary>
 /// A vocab entry with a furigana reading string.
 /// </summary>
-public class FuriganaSolution
+public class FuriganaSolution(VocabEntry vocab, List<FuriganaPart> furigana)
 {
     #region Properties
 
     /// <summary>
     /// Gets or sets the base dictionary entry of this furigana entry.
     /// </summary>
-    public VocabEntry Vocab { get; set; }
+    public VocabEntry Vocab { get; set; } = vocab;
 
     /// <summary>
     /// Gets or sets the furigana.
     /// </summary>
-    public List<FuriganaPart> Furigana { get; set; }
+    public List<FuriganaPart> Furigana { get; set; } = furigana;
 
     #endregion
 
@@ -30,12 +30,6 @@ public class FuriganaSolution
 
     public FuriganaSolution(VocabEntry vocab, params FuriganaPart[] parts)
         : this(vocab, parts.ToList()) { }
-
-    public FuriganaSolution(VocabEntry vocab, List<FuriganaPart> furigana)
-    {
-        Vocab = vocab;
-        Furigana = furigana;
-    }
 
     #endregion
 
@@ -57,26 +51,26 @@ public class FuriganaSolution
             return null;
         }
 
-        List<FuriganaPart> parts = new List<FuriganaPart>();
+        var parts = new List<FuriganaPart>();
+        var partSplit = s.Split(SeparatorHelper.MultiValueSeparator);
 
-        string[] partSplit = s.Split(SeparatorHelper.MultiValueSeparator);
-        foreach (string partString in partSplit)
+        foreach (var partString in partSplit)
         {
-            string[] fieldSeparator = partString.Split(SeparatorHelper.AssociationSeparator);
-            if (fieldSeparator.Count() == 2)
+            var fieldSeparator = partString.Split(SeparatorHelper.AssociationSeparator);
+            if (fieldSeparator.Length == 2)
             {
-                string indexesString = fieldSeparator[0];
-                string furiganaValue = fieldSeparator[1];
+                var indexesString = fieldSeparator[0];
+                var furiganaValue = fieldSeparator[1];
 
-                int? minIndex = 0;
-                int? maxIndex = 0;
-                string[] indexSplit = indexesString.Split(SeparatorHelper.RangeSeparator);
-                if (indexSplit.Count() == 2)
+                int? minIndex, maxIndex;
+
+                var indexSplit = indexesString.Split(SeparatorHelper.RangeSeparator);
+                if (indexSplit.Length == 2)
                 {
                     minIndex = ParsingHelper.ParseInt(indexSplit[0]);
                     maxIndex = ParsingHelper.ParseInt(indexSplit[1]);
                 }
-                else if (indexSplit.Count() == 1)
+                else if (indexSplit.Length == 1)
                 {
                     minIndex = ParsingHelper.ParseInt(indexSplit[0]);
                     maxIndex = minIndex;
@@ -139,11 +133,11 @@ public class FuriganaSolution
 
         // Now try to reconstitute the reading using the furigana parts.
         // This will allow us to test both 2 and 3.
-        StringBuilder reconstitutedReading = new StringBuilder();
+        var reconstitutedReading = new StringBuilder();
         for (int i = 0; i < v.KanjiReading.Length; i++)
         {
             // Try to find a matching part.
-            FuriganaPart matchingPart = furigana.FirstOrDefault(f => i >= f.StartIndex && i <= f.EndIndex);
+            var matchingPart = furigana.FirstOrDefault(f => i >= f.StartIndex && i <= f.EndIndex);
             if (matchingPart != null)
             {
                 // We have a matching part. Add the furigana string to the reconstituted reading.
@@ -215,7 +209,7 @@ public class FuriganaSolution
     /// False otherwise.</returns>
     public bool Check()
     {
-        return FuriganaSolution.Check(Vocab, Furigana);
+        return Check(Vocab, Furigana);
     }
 
     /// <summary>
@@ -243,7 +237,7 @@ public class FuriganaSolution
                 {
                     yield return new ReadingPart()
                     {
-                        Text = Vocab?.KanjiReading?.Substring(kanaStart.Value, i - kanaStart.Value)
+                        Text = Vocab?.KanjiReading?[kanaStart.Value..i]
                     };
                     kanaStart = null;
                 }
@@ -261,7 +255,7 @@ public class FuriganaSolution
             else
             {
                 // We are not on a furigana-covered character, must be kana. Set kanaStart if not already set.
-                kanaStart = kanaStart ?? i;
+                kanaStart ??= i;
             }
         }
 
@@ -270,7 +264,7 @@ public class FuriganaSolution
         {
             yield return new ReadingPart()
             {
-                Text = Vocab?.KanjiReading?.Substring(kanaStart.Value)
+                Text = Vocab?.KanjiReading?[kanaStart.Value..]
             };
         }
     }
@@ -280,7 +274,7 @@ public class FuriganaSolution
         // Example output:
         // For 大人買い (おとながい):
         // 0-1:おとな,2:が
-        StringBuilder result = new StringBuilder();
+        var result = new StringBuilder();
 
         result.Append(Vocab.KanjiReading);
         result.Append(SeparatorHelper.FileFieldSeparator);
@@ -301,8 +295,7 @@ public class FuriganaSolution
 
     public override bool Equals(object obj)
     {
-        FuriganaSolution other = obj as FuriganaSolution;
-        if (other != null)
+        if (obj is FuriganaSolution other)
         {
             // Compare both solutions.
             if (Vocab != other.Vocab || Furigana.Count != other.Furigana.Count)
@@ -316,7 +309,6 @@ public class FuriganaSolution
             return Furigana.All(f1 => other.Furigana.Any(f2 => f1.Equals(f2)))
                 && other.Furigana.All(f2 => Furigana.Any(f1 => f1.Equals(f2)));
         }
-
         return base.Equals(obj);
     }
 

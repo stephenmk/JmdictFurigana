@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace JmdictFurigana.Extensions;
 
@@ -13,11 +14,6 @@ public static class ListExtensions
     /// <returns>List containing cloned instances of the input.</returns>
     public static List<T> Clone<T>(this List<T> list) where T: ICloneable
     {
-        var output = new List<T>(list.Count);
-        foreach (T item in list)
-        {
-            output.Add((T)item.Clone());
-        }
-        return output;
+        return list.Select(item => (T)item.Clone()).ToList();
     }
 }

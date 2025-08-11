@@ -24,7 +24,7 @@ public class ResourceDownloader
     /// <summary>
     /// Downloads the Kanjidic2 XML file to its resource path.
     /// </summary>
-    public async Task DownloadKanjidic()
+    public static async Task Kanjidic()
     {
         await DownloadGzFile(Kanjidic2Uri, PathHelper.KanjiDic2Path);
     }
@@ -32,7 +32,7 @@ public class ResourceDownloader
     /// <summary>
     /// Downloads the JMdict file to its resource path.
     /// </summary>
-    public async Task DownloadJmdict()
+    public static async Task Jmdict()
     {
         await DownloadGzFile(JmdictUri, PathHelper.JmDictPath);
     }
@@ -40,7 +40,7 @@ public class ResourceDownloader
     /// <summary>
     /// Downloads the JMnedict file to its resource path.
     /// </summary>
-    public async Task DownloadJmnedict()
+    public static async Task Jmnedict()
     {
         await DownloadGzFile(JmnedictUri, PathHelper.JmneDictPath);
     }

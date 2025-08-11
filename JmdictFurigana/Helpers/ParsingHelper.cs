@@ -34,8 +34,7 @@ public static class ParsingHelper
             return null;
         }
 
-        short output = 0;
-        if (short.TryParse(input, NumberStyles, DefaultCulture, out output))
+        if (short.TryParse(input, NumberStyles, DefaultCulture, out short output))
         {
             return output;
         }
@@ -59,9 +58,7 @@ public static class ParsingHelper
         }
         else
         {
-            failureException = failureException
-                ?? new Exception(string.Format("Cannot parse \"{0}\" as a short.", input));
-
+            failureException ??= new Exception(string.Format("Cannot parse \"{0}\" as a short.", input));
             throw failureException;
         }
     }
@@ -78,8 +75,7 @@ public static class ParsingHelper
             return null;
         }
 
-        int output = 0;
-        if (int.TryParse(input, NumberStyles, DefaultCulture, out output))
+        if (int.TryParse(input, NumberStyles, DefaultCulture, out int output))
         {
             return output;
         }
@@ -103,8 +99,7 @@ public static class ParsingHelper
         }
         else
         {
-            failureException = failureException
-                ?? new Exception(string.Format("Cannot parse \"{0}\" as an integer.", input));
+            failureException ??= new Exception(string.Format("Cannot parse \"{0}\" as an integer.", input));
 
             throw failureException;
         }
@@ -122,8 +117,7 @@ public static class ParsingHelper
             return null;
         }
 
-        long output = 0;
-        if (long.TryParse(input, NumberStyles, DefaultCulture, out output))
+        if (long.TryParse(input, NumberStyles, DefaultCulture, out long output))
         {
             return output;
         }
@@ -147,9 +141,7 @@ public static class ParsingHelper
         }
         else
         {
-            failureException = failureException
-                ?? new Exception(string.Format("Cannot parse \"{0}\" as a long.", input));
-
+            failureException ??= new Exception(string.Format("Cannot parse \"{0}\" as a long.", input));
             throw failureException;
         }
     }
@@ -166,8 +158,7 @@ public static class ParsingHelper
             return null;
         }
 
-        float output = 0;
-        if (float.TryParse(input, NumberStyles, DefaultCulture, out output))
+        if (float.TryParse(input, NumberStyles, DefaultCulture, out float output))
         {
             return output;
         }
@@ -191,9 +182,7 @@ public static class ParsingHelper
         }
         else
         {
-            failureException = failureException
-                ?? new Exception(string.Format("Cannot parse \"{0}\" as a float.", input));
-
+            failureException ??= new Exception(string.Format("Cannot parse \"{0}\" as a float.", input));
             throw failureException;
         }
     }
@@ -210,8 +199,7 @@ public static class ParsingHelper
             return null;
         }
 
-        double output = 0;
-        if (double.TryParse(input, NumberStyles, DefaultCulture, out output))
+        if (double.TryParse(input, NumberStyles, DefaultCulture, out double output))
         {
             return output;
         }
@@ -235,8 +223,7 @@ public static class ParsingHelper
         }
         else
         {
-            failureException = failureException
-                ?? new Exception(string.Format("Cannot parse \"{0}\" as a double.", input));
+            failureException ??= new Exception(string.Format("Cannot parse \"{0}\" as a double.", input));
 
             throw failureException;
         }
@@ -258,8 +245,7 @@ public static class ParsingHelper
             return null;
         }
 
-        bool output = false;
-        if (bool.TryParse(input, out output))
+        if (bool.TryParse(input, out bool output))
         {
             return output;
         }
@@ -289,9 +275,7 @@ public static class ParsingHelper
         }
         else
         {
-            failureException = failureException
-                ?? new Exception(string.Format("Cannot parse \"{0}\" as a boolean.", input));
-
+            failureException ??= new Exception(string.Format("Cannot parse \"{0}\" as a boolean.", input));
             throw failureException;
         }
     }
@@ -348,11 +332,7 @@ public static class ParsingHelper
         }
         else
         {
-            failureException = failureException
-                ?? new Exception(string.Format(
-                    "Cannot parse \"{0}\" as a {1} value.",
-                    input, typeof(T).Name));
-
+            failureException ??= new Exception(string.Format("Cannot parse \"{0}\" as a {1} value.", input, typeof(T).Name));
             throw failureException;
         }
     }
@@ -370,8 +350,7 @@ public static class ParsingHelper
             return null;
         }
 
-        DateTime output = new DateTime();
-        if (DateTime.TryParseExact(input, format, DefaultCulture, DateTimeStyles.None, out output))
+        if (DateTime.TryParseExact(input, format, DefaultCulture, DateTimeStyles.None, out DateTime output))
         {
             return output;
         }
@@ -387,8 +366,7 @@ public static class ParsingHelper
     /// <param name="format">Date format string.</param>
     /// <param name="failureException">Exception to throw when the parse fails.</param>
     /// <returns>Value parsed.</returns>
-    public static DateTime ForceDateTime(string input, string format = "u",
-        Exception failureException = null)
+    public static DateTime ForceDateTime(string input, string format = "u", Exception failureException = null)
     {
         DateTime? output = ParseDateTime(input, format);
         if (output.HasValue)
@@ -397,9 +375,7 @@ public static class ParsingHelper
         }
         else
         {
-            failureException = failureException
-                ?? new Exception(string.Format("Cannot parse \"{0}\" as a DateTime.", input));
-
+            failureException ??= new Exception(string.Format("Cannot parse \"{0}\" as a DateTime.", input));
             throw failureException;
         }
     }

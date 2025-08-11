@@ -100,8 +100,7 @@ public class FuriganaResourceSet
     private void LoadKanjiDictionary()
     {
         _kanjiDictionary = [];
-        var etl = new KanjiEtl();
-        foreach (var kanji in etl.Execute())
+        foreach (var kanji in KanjiEtl.Execute())
         {
             AddKanjiEntry(kanji);
         }

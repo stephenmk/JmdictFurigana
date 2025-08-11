@@ -77,7 +77,7 @@ public class NoConsecutiveKanjiSolver : FuriganaSolver
     /// <summary>
     /// Creates a furigana solution from a regex match computed in the DoSolve method.
     /// </summary>
-    private FuriganaSolution MakeSolutionFromMatch(VocabEntry v, Match match, List<int> kanjiIndexes)
+    private static FuriganaSolution MakeSolutionFromMatch(VocabEntry v, Match match, List<int> kanjiIndexes)
     {
         if (match.Groups.Count != kanjiIndexes.Count + 1)
         {

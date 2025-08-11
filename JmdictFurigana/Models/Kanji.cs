@@ -31,7 +31,7 @@ public class Kanji
 
     public Kanji()
     {
-        Readings = new List<string>();
+        Readings = [];
         IsRealKanji = true;
     }
 

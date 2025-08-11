@@ -17,8 +17,8 @@ public class RepeatedKanjiSolver : FuriganaSolver
             // and our kana string can be cut in two. Just do that.
 
             yield return new FuriganaSolution(v,
-                new FuriganaPart(v.KanaReading.Substring(0, v.KanaReading.Length / 2), 0),
-                new FuriganaPart(v.KanaReading.Substring(v.KanaReading.Length / 2), 1));
+                new FuriganaPart(v.KanaReading[..(v.KanaReading.Length / 2)], 0),
+                new FuriganaPart(v.KanaReading[(v.KanaReading.Length / 2)..], 1));
         }
     }
 }

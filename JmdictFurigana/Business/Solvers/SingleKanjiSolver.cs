@@ -33,7 +33,7 @@ public class SingleKanjiSolver : FuriganaSolver
                     if (kanaReading.First() == c)
                     {
                         // Remove the first character of the reading.
-                        kanaReading = kanaReading.Substring(1);
+                        kanaReading = kanaReading[1..];
                     }
                     else
                     {
@@ -61,7 +61,7 @@ public class SingleKanjiSolver : FuriganaSolver
                     if (kanaReading.Last() == c)
                     {
                         // Eat the last character of the reading.
-                        kanaReading = kanaReading.Substring(0, kanaReading.Length - 1);
+                        kanaReading = kanaReading[..^1];
                     }
                     else
                     {

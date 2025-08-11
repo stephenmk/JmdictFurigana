@@ -2,19 +2,19 @@
 
 namespace JmdictFurigana.Models;
 
-public class SpecialReading : IEqualityComparer<SpecialReading>
+public class SpecialReading(string kanaReading, FuriganaSolution furigana) : IEqualityComparer<SpecialReading>
 {
     #region Properties
 
     /// <summary>
     /// Gets or sets the kana reading string of the special reading.
     /// </summary>
-    public string KanaReading { get; set; }
+    public string KanaReading { get; set; } = kanaReading;
 
     /// <summary>
     /// Gets or sets the furigana solution of the special reading.
     /// </summary>
-    public FuriganaSolution Furigana { get; set; }
+    public FuriganaSolution Furigana { get; set; } = furigana;
 
     #endregion
 
@@ -23,19 +23,13 @@ public class SpecialReading : IEqualityComparer<SpecialReading>
     public SpecialReading()
         : this(string.Empty, null) { }
 
-    public SpecialReading(string kanaReading, FuriganaSolution furigana)
-    {
-        KanaReading = kanaReading;
-        Furigana = furigana;
-    }
-
     #endregion
 
     #region Methods
 
     public bool Equals(SpecialReading x, SpecialReading y)
     {
-        if (object.ReferenceEquals(x, y))
+        if (ReferenceEquals(x, y))
         {
             return true;
         }
