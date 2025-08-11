@@ -13,12 +13,11 @@ public static class ListExtensions
     /// <returns>List containing cloned instances of the input.</returns>
     public static List<T> Clone<T>(this List<T> list) where T: ICloneable
     {
-        List<T> output = new List<T>(list.Count);
+        var output = new List<T>(list.Count);
         foreach (T item in list)
         {
             output.Add((T)item.Clone());
         }
-
         return output;
     }
 }

@@ -21,7 +21,7 @@ public class LengthMatchSolver : FuriganaSolver
     {
         if (v.KanjiReading.Length == v.KanaReading.Length)
         {
-            List<FuriganaPart> parts = new List<FuriganaPart>();
+            var parts = new List<FuriganaPart>();
             for (int i = 0; i < v.KanjiReading.Length; i++)
             {
                 if (r.GetKanji(v.KanjiReading[i]) != null)
@@ -44,7 +44,7 @@ public class LengthMatchSolver : FuriganaSolver
                 }
             }
 
-            if (parts.Any())
+            if (parts.Count > 0)
             {
                 yield return new FuriganaSolution(v, parts);
             }

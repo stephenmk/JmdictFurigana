@@ -5,14 +5,10 @@ namespace JmdictFurigana.Business;
 
 public class OverrideSolver : FuriganaSolver
 {
-    #region Constructors
-
     public OverrideSolver()
     {
         Priority = 9999; // Critical hit.
     }
-
-    #endregion
 
     /// <summary>
     /// Attempts to solve furigana by looking up for solutions in the override list.
@@ -23,10 +19,10 @@ public class OverrideSolver : FuriganaSolver
         if (solution != null)
         {
             yield return new FuriganaSolution()
-                {
-                    Furigana = solution.Furigana,
-                    Vocab = v
-                };
+            {
+                Furigana = solution.Furigana,
+                Vocab = v,
+            };
         }
     }
 }

@@ -18,12 +18,12 @@ public class NoConsecutiveKanjiSolver : FuriganaSolver
         string regGreedy = "^";
         string regLazy = "^";
         bool consecutiveMarker = false;
-        List<int> kanjiIndexes = new List<int>(4);
+        var kanjiIndexes = new List<int>(4);
         for (int i = 0; i < v.KanjiReading.Length; i++)
         {
             char c = v.KanjiReading[i];
-            Kanji k = r.GetKanji(c);
-            if (k == null)
+            var kanji = r.GetKanji(c);
+            if (kanji == null)
             {
                 // Add the characters to the string. No capture group for kana.
                 regGreedy += string.Format(c.ToString());
@@ -53,16 +53,16 @@ public class NoConsecutiveKanjiSolver : FuriganaSolver
         // ^(.+)ち(.+)ぶ$
         // ^(.+?)ち(.+?)ぶ$
 
-        Regex regexGreedy = new Regex(regGreedy);
-        Regex regexLazy = new Regex(regLazy);
-        Match matchGreedy = regexGreedy.Match(v.KanaReading);
-        Match matchLazy = regexLazy.Match(v.KanaReading);
+        var regexGreedy = new Regex(regGreedy);
+        var regexLazy = new Regex(regLazy);
+        var matchGreedy = regexGreedy.Match(v.KanaReading);
+        var matchLazy = regexLazy.Match(v.KanaReading);
 
         if (matchGreedy.Success && matchLazy.Success)
         {
             // Obtain both solutions.
-            FuriganaSolution greedySolution = MakeSolutionFromMatch(v, matchGreedy, kanjiIndexes);
-            FuriganaSolution lazySolution = MakeSolutionFromMatch(v, matchLazy, kanjiIndexes);
+            var greedySolution = MakeSolutionFromMatch(v, matchGreedy, kanjiIndexes);
+            var lazySolution = MakeSolutionFromMatch(v, matchLazy, kanjiIndexes);
 
             // Are both solutions non-null and equivalent?
             if (greedySolution != null && lazySolution != null && greedySolution.Equals(lazySolution))
@@ -84,10 +84,10 @@ public class NoConsecutiveKanjiSolver : FuriganaSolver
             return null;
         }
 
-        List<FuriganaPart> parts = new List<FuriganaPart>(match.Groups.Count - 1);
+        var parts = new List<FuriganaPart>(match.Groups.Count - 1);
         for (int i = 1; i < match.Groups.Count; i++)
         {
-            Group group = match.Groups[i];
+            var group = match.Groups[i];
             parts.Add(new FuriganaPart(group.Value, kanjiIndexes[i - 1]));
         }
 
