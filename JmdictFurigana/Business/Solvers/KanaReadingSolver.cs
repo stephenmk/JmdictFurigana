@@ -7,7 +7,7 @@ namespace JmdictFurigana.Business.Solvers;
 
 public class KanaReadingSolver : FuriganaSolver
 {
-    private static readonly char[] ImpossibleCutStart = new char[] { 'っ', 'ょ', 'ゃ', 'ゅ', 'ん' };
+    private static readonly char[] ImpossibleCutStart = ['っ', 'ょ', 'ゃ', 'ゅ', 'ん'];
 
     /// <summary>
     /// Attempts to solve furigana by reading the kana string and attributing kanji a reading based

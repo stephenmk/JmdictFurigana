@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using JmdictFurigana.Etl;
-using JmdictFurigana.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JmdictFurigana.Tests;

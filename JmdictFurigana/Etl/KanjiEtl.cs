@@ -42,66 +42,41 @@ public class KanjiEtl
     /// </summary>
     public IEnumerable<Kanji> Execute()
     {
-        // Load the supplement file.
-        var supplementaryKanji = new List<Kanji>();
-        foreach (string line in File.ReadAllLines(PathHelper.SupplementaryKanjiPath))
-        {
-            if (string.IsNullOrWhiteSpace(line) || line.First() == ';')
-                continue;
+        var supplementaryKanjis = SupplementaryKanjis();
 
-            char c = line.First();
-            string[] split = line.Split(SeparatorHelper.FileFieldSeparator);
-            string[] readings = split[1].Split(SeparatorHelper.FileReadingSeparator);
+        var validReadingAttrs = new HashSet<string> {
+            XmlAttributeValue_OnYomiReading,
+            XmlAttributeValue_KunYomiReading,
+        };
 
-            supplementaryKanji.Add(new Kanji()
-            {
-                Character = c,
-                Readings = readings.ToList(),
-                ReadingsWithNanori = readings.ToList(),
-                IsRealKanji = false
-            });
-        }
+        var xdoc = XDocument.Load(PathHelper.KanjiDic2Path);
 
-        // Load the KanjiDic2 file.
-        XDocument xdoc = XDocument.Load(PathHelper.KanjiDic2Path);
-
-        // Browse kanji nodes.
         foreach (var xkanji in xdoc.Root.Elements(XmlNode_Character))
         {
+            var xreadingMeaning = xkanji.Element(XmlNode_ReadingMeaning);
             var kanji = new Kanji
             {
-                Character = xkanji.Element(XmlNode_Literal).Value.First()
+                Character = xkanji.Element(XmlNode_Literal).Value.First(),
+                Readings = xreadingMeaning?.Element(XmlNode_ReadingMeaningGroup)?
+                    .Elements(XmlNode_Reading)
+                    .Where(r => validReadingAttrs.Contains(r.Attribute(XmlAttribute_ReadingType).Value))
+                    .Select(r => KanaHelper.ToHiragana(r.Value))
+                    .ToList() ?? []
             };
 
-            // In the reading/meaning node...
-            var xreadingMeaning = xkanji.Element(XmlNode_ReadingMeaning);
-            if (xreadingMeaning != null)
-            {
-                // Browse the reading group...
-                var xrmGroup = xreadingMeaning.Element(XmlNode_ReadingMeaningGroup);
-                if (xrmGroup != null)
-                {
-                    // Read the readings and add them to the readings of the kanji.
-                    foreach (var xreading in xrmGroup.Elements(XmlNode_Reading)
-                        .Where(x => x.Attribute(XmlAttribute_ReadingType).Value == XmlAttributeValue_OnYomiReading
-                            || x.Attribute(XmlAttribute_ReadingType).Value == XmlAttributeValue_KunYomiReading))
-                    {
-                        kanji.Readings.Add(KanaHelper.ToHiragana(xreading.Value));
-                    }
-                }
-            }
-
             // See if there's a supplementary entry for this kanji.
-            var supp = supplementaryKanji.FirstOrDefault(k => k.Character == kanji.Character);
+            var supp = supplementaryKanjis.FirstOrDefault(k => k.Character == kanji.Character);
             if (supp != null)
             {
                 // Supplementary entry found. Remove it from the list and add its readings to our current entry.
                 kanji.Readings.AddRange(supp.Readings);
-                supplementaryKanji.Remove(supp);
+                supplementaryKanjis.Remove(supp);
             }
 
             // Read the nanori readings
-            var nanoriReadings = xreadingMeaning?.Elements(XmlNode_Nanori).Select(n => n.Value).ToList() ?? new List<string>();
+            var nanoriReadings = xreadingMeaning?.Elements(XmlNode_Nanori)
+                .Select(n => n.Value)
+                .ToList() ?? [];
             kanji.ReadingsWithNanori = kanji.Readings.Union(nanoriReadings).Distinct().ToList();
 
             // Return the kanji read and go to the next kanji node.
@@ -111,11 +86,34 @@ public class KanjiEtl
         }
 
         // Return the remaining supplementary kanji as new kanji.
-        foreach (var kanji in supplementaryKanji)
+        foreach (var kanji in supplementaryKanjis)
         {
             yield return kanji;
         }
     }
 
+    private static List<Kanji> SupplementaryKanjis()
+    {
+        var supplementaryKanjis = new List<Kanji>();
+        foreach (string line in File.ReadAllLines(PathHelper.SupplementaryKanjiPath))
+        {
+            if (string.IsNullOrWhiteSpace(line) || line.First() == ';')
+                continue;
+
+            char c = line.First();
+            var split = line.Split(SeparatorHelper.FileFieldSeparator);
+            var readings = split[1].Split(SeparatorHelper.FileReadingSeparator);
+
+            var kanji = new Kanji()
+            {
+                Character = c,
+                Readings = readings.ToList(),
+                ReadingsWithNanori = readings.ToList(),
+                IsRealKanji = false
+            };
+            supplementaryKanjis.Add(kanji);
+        }
+        return supplementaryKanjis;
+    }
     #endregion
 }

@@ -13,50 +13,34 @@ namespace JmdictFurigana.Etl;
 /// <summary>
 /// Parses the dictionary file and produces VocabEntry model instances.
 /// </summary>
-public class DictionaryEtl
+public class DictionaryEtl(string dictionaryFilePath)
 {
-    private static readonly XNamespace XmlNs = "http://www.w3.org/XML/1998/namespace";
-    private const string XmlNode_Entry = "entry";
-    private const string XmlNode_KanjiElement = "k_ele";
-    private const string XmlNode_KanjiForm = "keb";
-    private const string XmlNode_ReadingElement = "r_ele";
-    private const string XmlNode_ReadingForm = "reb";
-    private const string XmlNode_ReadingConstraint = "re_restr";
-    private const string XmlNode_NoKanji = "re_nokanji";
-
-    private ILogger _logger = LogManager.GetCurrentClassLogger();
-
-    public string DictionaryFilePath { get; set; }
-
-    public DictionaryEtl(string dictionaryFilePath)
-    {
-        DictionaryFilePath = dictionaryFilePath;
-    }
+    public string DictionaryFilePath { get; set; } = dictionaryFilePath;
 
     /// <summary>
     /// Parses the dictionary file and returns entries.
     /// </summary>
     public IEnumerable<VocabEntry> Execute()
     {
-        var xdoc = LoadXmlDocument();
-        foreach (var xentry in xdoc.Root.Elements(XmlNode_Entry))
+        var xDoc = LoadXmlDocument();
+        foreach (var xEntry in xDoc.Root.Elements("entry"))
         {
-            var kanjiForms = ExtractKanjiForms(xentry);
+            var kanjiForms = KanjiForms(xEntry);
             if (kanjiForms.Count == 0)
                 continue;
-            foreach (var xreadingElement in xentry.Elements(XmlNode_ReadingElement))
+            foreach (var xReadingElement in xEntry.Elements("r_ele"))
             {
-                if (xreadingElement.HasElement(XmlNode_NoKanji))
+                if (xReadingElement.HasElement("re_nokanji"))
                     continue;
-                if (xreadingElement.Elements("re_inf").Select(x => x.Value).Contains("sk"))
+                if (xReadingElement.Elements("re_inf").Any(i => i.Value == "sk"))
                     continue;
 
-                var constraintForms = xreadingElement
-                    .Elements(XmlNode_ReadingConstraint)
-                    .Select(x => x.Value).ToList();
+                var constraintForms = xReadingElement.Elements("re_restr")
+                    .Select(k => k.Value)
+                    .ToList();
 
                 var relevantKanjiForms = constraintForms.Count > 0 ? constraintForms : kanjiForms;
-                var reading = xreadingElement.Element(XmlNode_ReadingForm).Value;
+                var reading = xReadingElement.Element("reb").Value;
 
                 foreach (var kanjiForm in relevantKanjiForms)
                 {
@@ -86,15 +70,11 @@ public class DictionaryEtl
         return doc;
     }
 
-    private List<string> ExtractKanjiForms(XElement entry)
+    private static List<string> KanjiForms(XElement entry)
     {
-        var kanjiForms = new List<string>();
-        foreach (var xkanjiElement in entry.Elements(XmlNode_KanjiElement))
-        {
-            if (xkanjiElement.Elements("ke_inf").Select(i => i.Value).Contains("sK"))
-                continue;
-            kanjiForms.Add(xkanjiElement.Element(XmlNode_KanjiForm).Value);
-        }
-        return kanjiForms;
+        return entry.Elements("k_ele")
+            .Where(k => !k.Elements("ke_inf").Any(i => i.Value == "sK"))
+            .Select(k => k.Element("keb").Value)
+            .ToList();
     }
 }

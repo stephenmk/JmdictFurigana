@@ -14,7 +14,7 @@ public static class ReadingCutter
         'っ',
         'ょ',
         'ゅ',
-        'ん'
+        'ん',
     ];
 
     /// <summary>
