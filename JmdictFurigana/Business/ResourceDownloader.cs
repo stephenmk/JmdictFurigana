@@ -12,7 +12,7 @@ namespace JmdictFurigana.Business;
 public class ResourceDownloader
 {
     // HttpClient is intended to be instantiated once per application, rather than per-use
-    private static readonly HttpClient client = new HttpClient();
+    private static readonly HttpClient Client = new();
 
     private const string Kanjidic2Uri = "http://www.edrdg.org/kanjidic/kanjidic2.xml.gz";
 
@@ -53,7 +53,7 @@ public class ResourceDownloader
     private static async Task DownloadGzFile(string uri, string targetPath)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
-        using var httpStream = await ResourceDownloader.client.GetStreamAsync(uri);
+        using var httpStream = await Client.GetStreamAsync(uri);
         using var gzipStream = new GZipStream(httpStream, CompressionMode.Decompress);
         using var fileStream = new FileStream(targetPath, FileMode.Create);
         gzipStream.CopyTo(fileStream);

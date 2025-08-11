@@ -12,31 +12,31 @@ namespace JmdictFurigana.Business;
 /// </summary>
 public static class ReadingExpander
 {
-    private static readonly Dictionary<char, char[]> RendakuDictionary = new Dictionary<char, char[]>()
+    private static readonly Dictionary<char, char[]> RendakuDictionary = new()
     {
-        {'か', new char[]{'が'}},
-        {'き', new char[]{'ぎ'}},
-        {'く', new char[]{'ぐ'}},
-        {'け', new char[]{'げ'}},
-        {'こ', new char[]{'ご'}},
-        {'さ', new char[]{'ざ'}},
-        {'し', new char[]{'じ'}},
-        {'す', new char[]{'ず'}},
-        {'せ', new char[]{'ぜ'}},
-        {'そ', new char[]{'ぞ'}},
-        {'た', new char[]{'だ'}},
-        {'ち', new char[]{'ぢ','じ'}},
-        {'つ', new char[]{'づ','ず'}},
-        {'て', new char[]{'で'}},
-        {'と', new char[]{'ど'}},
-        {'は', new char[]{'ば','ぱ'}},
-        {'ひ', new char[]{'び','ぴ'}},
-        {'ふ', new char[]{'ぶ','ぷ'}},
-        {'へ', new char[]{'べ','ぺ'}},
-        {'ほ', new char[]{'ぼ','ぽ'}},
+        {'か', ['が']},
+        {'き', ['ぎ']},
+        {'く', ['ぐ']},
+        {'け', ['げ']},
+        {'こ', ['ご']},
+        {'さ', ['ざ']},
+        {'し', ['じ']},
+        {'す', ['ず']},
+        {'せ', ['ぜ']},
+        {'そ', ['ぞ']},
+        {'た', ['だ']},
+        {'ち', ['ぢ','じ']},
+        {'つ', ['づ','ず']},
+        {'て', ['で']},
+        {'と', ['ど']},
+        {'は', ['ば','ぱ']},
+        {'ひ', ['び','ぴ']},
+        {'ふ', ['ぶ','ぷ']},
+        {'へ', ['べ','ぺ']},
+        {'ほ', ['ぼ','ぽ']},
     };
 
-    private static readonly Dictionary<string, string> AfterDotKunYomiTransformDictionary = new Dictionary<string, string>()
+    private static readonly Dictionary<string, string> AfterDotKunYomiTransformDictionary = new()
     {
         {"く", "き"},
         {"ぐ", "ぎ"},
@@ -45,16 +45,16 @@ public static class ReadingExpander
         {"む", "み"},
         {"る", "り"},
         {"ぶ", "び"},
-        {"う", "い"}
+        {"う", "い"},
     };
 
-    private static readonly char[] SmallTsuRendakuList = new char[]
-    {
+    private static readonly char[] SmallTsuRendakuList =
+    [
         'つ',
         'く',
         'き',
         'ち'
-    };
+    ];
 
     /// <summary>
     /// Given a kanji, finds and returns all potential readings that it could take in a string.
@@ -68,8 +68,8 @@ public static class ReadingExpander
     /// <returns>A list containing all potential readings that the kanji could take.</returns>
     public static List<string> GetPotentialKanjiReadings(Kanji k, bool isFirstChar, bool isLastChar, bool useNanori)
     {
-        List<string> output = new List<string>();
-        foreach (string reading in (useNanori ? k.ReadingsWithNanori : k.Readings))
+        var output = new List<string>();
+        foreach (string reading in useNanori ? k.ReadingsWithNanori : k.Readings)
         {
             string r = reading.Replace("-", string.Empty);
             if (!KanaHelper.IsAllKatakana(r))
@@ -78,11 +78,11 @@ public static class ReadingExpander
             }
 
             string[] dotSplit = r.Split('.');
-            if (dotSplit.Count() == 1)
+            if (dotSplit.Length == 1)
             {
                 output.Add(r);
             }
-            else if (dotSplit.Count() == 2)
+            else if (dotSplit.Length == 2)
             {
                 output.Add(dotSplit[0]);
                 output.Add(r.Replace(".", string.Empty));
@@ -136,28 +136,26 @@ public static class ReadingExpander
     /// <returns>A list containing all potential readings the expression could assume.</returns>
     public static List<SpecialReading> GetPotentialSpecialReadings(SpecialExpression sp, bool isFirstChar, bool isLastChar)
     {
-        // Aaargh that's a mess.
-        List<SpecialReading> output = new List<SpecialReading>(sp.Readings);
+        var output = new List<SpecialReading>(sp.Readings);
 
         // Add final small tsu rendaku
         if (!isLastChar)
         {
-            List<SpecialReading> add = new List<SpecialReading>();
-            foreach (SpecialReading r in output)
+            var add = new List<SpecialReading>();
+            foreach (var r in output)
             {
                 if (SmallTsuRendakuList.Contains(r.KanaReading.Last()))
                 {
                     string newKanaReading = r.KanaReading.Substring(0, r.KanaReading.Length - 1) + "っ";
-                    SpecialReading newReading = new SpecialReading(newKanaReading, new FuriganaSolution(r.Furigana.Vocab,
+                    var newReading = new SpecialReading(newKanaReading, new FuriganaSolution(r.Furigana.Vocab,
                         r.Furigana.Furigana.Clone()));
 
-                    List<FuriganaPart> affectedParts = newReading.Furigana.GetPartsForIndex(
+                    var affectedParts = newReading.Furigana.GetPartsForIndex(
                         newReading.Furigana.Vocab.KanjiReading.Length - 1);
-                    foreach (FuriganaPart part in affectedParts)
+                    foreach (var part in affectedParts)
                     {
                         part.Value = part.Value.Remove(part.Value.Length - 1) + "っ";
                     }
-
                     add.Add(newReading);
                 }
             }
@@ -167,36 +165,34 @@ public static class ReadingExpander
         // Rendaku
         if (!isFirstChar)
         {
-            List<SpecialReading> add = new List<SpecialReading>();
-            foreach (SpecialReading r in output)
+            var add = new List<SpecialReading>();
+            foreach (var r in output)
             {
                 if (RendakuDictionary.ContainsKey(r.KanaReading.First()))
                 {
                     foreach (char ren in RendakuDictionary[r.KanaReading.First()])
                     {
                         string newKanaReading = ren.ToString() + r.KanaReading.Substring(1);
-                        SpecialReading newReading = new SpecialReading(newKanaReading, new FuriganaSolution(r.Furigana.Vocab,
+                        var newReading = new SpecialReading(newKanaReading, new FuriganaSolution(r.Furigana.Vocab,
                             r.Furigana.Furigana.Clone()));
 
-                        List<FuriganaPart> affectedParts = newReading.Furigana.GetPartsForIndex(0);
-                        foreach (FuriganaPart part in affectedParts)
+                        var affectedParts = newReading.Furigana.GetPartsForIndex(0);
+                        foreach (var part in affectedParts)
                         {
                             part.Value = ren.ToString() + part.Value.Substring(1);
                         }
-
                         add.Add(newReading);
                     }
                 }
             }
             output.AddRange(add);
         }
-
         return output.Distinct().ToList();
     }
 
     private static List<string> GetSmallTsuRendaku(List<string> readings)
     {
-        List<string> addedOutput = new List<string>();
+        var addedOutput = new List<string>();
         foreach (string r in readings)
         {
             if (SmallTsuRendakuList.Contains(r.Last()))
@@ -210,7 +206,7 @@ public static class ReadingExpander
 
     private static List<string> GetAllRendaku(List<string> readings)
     {
-        List<string> rendakuOutput = new List<string>();
+        var rendakuOutput = new List<string>();
         foreach (string r in readings)
         {
             if (RendakuDictionary.ContainsKey(r.First()))
@@ -221,7 +217,6 @@ public static class ReadingExpander
                 }
             }
         }
-
         return rendakuOutput;
     }
 }

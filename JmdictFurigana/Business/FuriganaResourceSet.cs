@@ -21,9 +21,9 @@ public class FuriganaResourceSet
 
     public FuriganaResourceSet()
     {
-        _kanjiDictionary = new Dictionary<char, Kanji>();
-        _overrideList = new Dictionary<string, FuriganaSolution>();
-        _specialExpressions = new Dictionary<string, SpecialExpression>();
+        _kanjiDictionary = [];
+        _overrideList = [];
+        _specialExpressions = [];
     }
 
     #endregion
@@ -48,7 +48,7 @@ public class FuriganaResourceSet
     /// </summary>
     private void LoadOverrideList()
     {
-        _overrideList = new Dictionary<string, FuriganaSolution>();
+        _overrideList = [];
         foreach (string line in File.ReadAllLines(PathHelper.OverrideFuriganaPath))
         {
             if (string.IsNullOrWhiteSpace(line) || line.First() == ';')
@@ -64,7 +64,7 @@ public class FuriganaResourceSet
     /// </summary>
     private void LoadSpecialExpressions()
     {
-        _specialExpressions = new Dictionary<string, SpecialExpression>();
+        _specialExpressions = [];
         foreach (string line in File.ReadAllLines(PathHelper.SpecialReadingsPath))
         {
             if (string.IsNullOrWhiteSpace(line) || line.First() == ';')
@@ -74,15 +74,15 @@ public class FuriganaResourceSet
             string kanjiReading = split[0];
             string kanaReading = split[1];
 
-            VocabEntry v = new VocabEntry(kanjiReading, kanaReading);
+            VocabEntry v = new(kanjiReading, kanaReading);
 
             // Read the solution if it is explicitly written. Compute it otherwise.
-            FuriganaSolution solution = split.Count() == 3 ?
+            FuriganaSolution solution = split.Length == 3 ?
                 FuriganaSolution.Parse(split[2], v)
                 : new FuriganaSolution(v, new FuriganaPart(kanaReading, 0, kanjiReading.Length - 1));
 
             // Add the special reading or special expression.
-            SpecialReading specialReading = new SpecialReading(kanaReading, solution);
+            var specialReading = new SpecialReading(kanaReading, solution);
             if (_specialExpressions.ContainsKey(kanjiReading))
             {
                 _specialExpressions[kanjiReading].Readings.Add(specialReading);

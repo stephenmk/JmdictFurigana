@@ -9,13 +9,13 @@ public static class ReadingCutter
 {
     private static readonly int MaxKanaPerKanji = 4;
 
-    private static readonly char[] ImpossibleCutStart = new char[]
-    {
+    private static readonly char[] ImpossibleCutStart =
+    [
         'っ',
         'ょ',
         'ゅ',
         'ん'
-    };
+    ];
 
     /// <summary>
     /// Gets all possible reading cuts of the kana reading of the specified vocab entry, considering
@@ -32,7 +32,7 @@ public static class ReadingCutter
     public static IEnumerable<string> GetAllPossibleCuts(VocabEntry v)
     {
         int cutCount = v.KanjiReading.Length;
-        return GetCuts(v.KanaReading, v.KanjiReading.Length);
+        return GetCuts(v.KanaReading, cutCount);
     }
 
     /// <summary>

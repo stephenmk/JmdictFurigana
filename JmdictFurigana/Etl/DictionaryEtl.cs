@@ -72,18 +72,17 @@ public class DictionaryEtl
 
     private XDocument LoadXmlDocument()
     {
-        XDocument doc;
+        var xmlFileTextContent = File.ReadAllText(DictionaryFilePath);
+        var bytes = Encoding.UTF8.GetBytes(xmlFileTextContent);
+        using var stream = new MemoryStream(bytes);
         var settings = new XmlReaderSettings
         {
             DtdProcessing = DtdProcessing.Parse,
             MaxCharactersFromEntities = long.MaxValue,
             MaxCharactersInDocument = long.MaxValue,
         };
-        var xmlFileTextContent = File.ReadAllText(DictionaryFilePath);
-        var bytes = Encoding.UTF8.GetBytes(xmlFileTextContent);
-        using (var stream = new MemoryStream(bytes))
-        using (var reader = XmlReader.Create(stream, settings))
-        doc = XDocument.Load(reader);
+        using var reader = XmlReader.Create(stream, settings);
+        var doc = XDocument.Load(reader);
         return doc;
     }
 
