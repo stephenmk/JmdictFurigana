@@ -18,11 +18,9 @@ public class Program
         logger.Info("Starting.");
 
         var downloader = new ResourceDownloader();
-        logger.Info("Downloading the Kanjidic2 file...");
+        logger.Info("Downloading the Kanjidic2, Jmdict, and Jmnedict files...");
         var t1 = downloader.DownloadKanjidic();
-        logger.Info("Downloading the Jmdict file...");
         var t2 = downloader.DownloadJmdict();
-        logger.Info("Downloading the Jmnedict file...");
         var t3 = downloader.DownloadJmnedict();
 
         await Task.WhenAll(t1, t2, t3);
