@@ -3,7 +3,7 @@ using System.Linq;
 using JmdictFurigana.Models;
 using JmdictFurigana.Helpers;
 
-namespace JmdictFurigana.Business;
+namespace JmdictFurigana.Business.Solvers;
 
 public class KanaReadingSolver : FuriganaSolver
 {

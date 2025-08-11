@@ -4,13 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-using JmdictFurigana.Business;
 using Newtonsoft.Json;
 using NLog;
 using SharpCompress.Common;
 using SharpCompress.Writers;
 
-namespace JmdictFurigana;
+namespace JmdictFurigana.Business;
 
 /// <summary>
 /// Writes the furigana file.

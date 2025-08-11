@@ -2,7 +2,7 @@
 using JmdictFurigana.Models;
 using System.Collections.Generic;
 
-namespace JmdictFurigana.Business;
+namespace JmdictFurigana.Business.Solvers;
 
 public class SingleCharacterSolver : FuriganaSolver
 {

@@ -4,7 +4,7 @@ using JmdictFurigana.Models;
 using JmdictFurigana.Helpers;
 using JmdictFurigana.Extensions;
 
-namespace JmdictFurigana.Business;
+namespace JmdictFurigana.Business.Solvers;
 
 public class KanjiReadingSolver : FuriganaSolver
 {

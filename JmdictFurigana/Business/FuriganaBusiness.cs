@@ -1,10 +1,10 @@
-﻿using JmdictFurigana.Business;
-using JmdictFurigana.Models;
+﻿using JmdictFurigana.Models;
+using JmdictFurigana.Business.Solvers;
 using System.Collections.Generic;
 using System.Linq;
 using NLog;
 
-namespace JmdictFurigana;
+namespace JmdictFurigana.Business;
 
 /// <summary>
 /// Works with kanji and dictionary entries to attach each entry a furigana string.

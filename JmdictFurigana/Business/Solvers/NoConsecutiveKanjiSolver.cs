@@ -2,7 +2,7 @@
 using JmdictFurigana.Models;
 using System.Text.RegularExpressions;
 
-namespace JmdictFurigana.Business;
+namespace JmdictFurigana.Business.Solvers;
 
 public class NoConsecutiveKanjiSolver : FuriganaSolver
 {

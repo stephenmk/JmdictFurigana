@@ -2,7 +2,7 @@
 using System.Linq;
 using JmdictFurigana.Models;
 
-namespace JmdictFurigana.Business;
+namespace JmdictFurigana.Business.Solvers;
 
 public class SingleKanjiSolver : FuriganaSolver
 {
