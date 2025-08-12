@@ -2,7 +2,6 @@
 using JmdictFurigana.Business.Solvers;
 using System.Collections.Generic;
 using System.Linq;
-using NLog;
 
 namespace JmdictFurigana.Business;
 
@@ -64,7 +63,7 @@ public class FuriganaBusiness
 
         Solvers ??= [
             new KanaReadingSolver(),
-            new KanjiReadingSolver(useNanori:DictionaryFile == DictionaryFile.Jmnedict),
+            new KanjiReadingSolver(useNanori: DictionaryFile == DictionaryFile.Jmnedict),
             new LengthMatchSolver(),
             new NoConsecutiveKanjiSolver(),
             new OverrideSolver(),
@@ -83,7 +82,7 @@ public class FuriganaBusiness
     /// <returns>The furigana vocab entries.</returns>
     public IEnumerable<FuriganaSolutionSet> Execute(IEnumerable<VocabEntry> vocab)
     {
-        foreach (VocabEntry v in vocab)
+        foreach (var v in vocab)
         {
             yield return Execute(v);
         }
@@ -97,7 +96,7 @@ public class FuriganaBusiness
             return new FuriganaSolutionSet(v);
         }
 
-        FuriganaSolutionSet result = Process(v);
+        var result = Process(v);
         if (!result.Any() && v.KanjiReading.StartsWith('御'))
         {
             // When a word starts with 御 (honorific, often used), try to override the
@@ -122,7 +121,7 @@ public class FuriganaBusiness
         var solutionSet = new FuriganaSolutionSet(v);
 
         int priority = Solvers.First().Priority;
-        foreach (FuriganaSolver solver in Solvers)
+        foreach (var solver in Solvers)
         {
             if (solver.Priority < priority)
             {

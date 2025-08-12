@@ -258,7 +258,7 @@ public static class KanaHelper
             return null;
         }
 
-        RegexOptions options = RegexOptions.CultureInvariant | RegexOptions.Multiline;
+        var options = RegexOptions.CultureInvariant | RegexOptions.Multiline;
 
         // Then, replace 2 letter characters:
         kana = kana.Replace("イェ", "YE");

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-using NLog;
+
 
 namespace JmdictFurigana.Etl;
 
