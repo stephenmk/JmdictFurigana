@@ -55,7 +55,7 @@ public class FuriganaSolutionSet(VocabEntry vocab)
     public int SafeAdd(IEnumerable<FuriganaSolution> solutions)
     {
         int count = 0;
-        foreach (FuriganaSolution solution in solutions)
+        foreach (var solution in solutions)
         {
             if (SafeAdd(solution))
             {

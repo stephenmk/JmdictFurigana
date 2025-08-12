@@ -49,21 +49,12 @@ class FuriganaFileWriter(string outputPath)
             {
                 var singleSolution = solution.GetSingleSolution();
 
-                if (solution.Any())
-                {
-                    if (singleSolution == null)
-                    {
-                        logger.Debug($"➕   {solution}");
-                    }
-                    else
-                    {
-                        logger.Debug($"◯   {solution}");
-                    }
-                }
-                else
-                {
+                if (!solution.Any())
                     logger.Debug($"X    {solution.Vocab.KanjiReading}|{solution.Vocab.KanaReading}|???");
-                }
+                else if (singleSolution == null)
+                    logger.Debug($"➕   {solution}");
+                else
+                    logger.Debug($"◯   {solution}");
 
                 if (singleSolution != null && !AlreadyWritten.Contains(singleSolution.ToString()))
                 {
@@ -73,9 +64,7 @@ class FuriganaFileWriter(string outputPath)
                 }
 
                 if (singleSolution != null)
-                {
                     success++;
-                }
 
                 total++;
             }
@@ -93,9 +82,7 @@ class FuriganaFileWriter(string outputPath)
         {
             // Create a .tar file in the MemoryStream
             using (var tarWriter = WriterFactory.Open(tarStream, ArchiveType.Tar, CompressionType.None))
-            {
                 tarWriter.Write(jsonFileName, jsonFileName);
-            }
 
             // Reset the position of the MemoryStream to the beginning
             tarStream.Position = 0;
@@ -106,7 +93,7 @@ class FuriganaFileWriter(string outputPath)
             tarStream.CopyTo(gzStream);
         }
 
-        TimeSpan duration = DateTime.Now - start;
+        var duration = DateTime.Now - start;
         logger.Info($"Successfuly ended process with {success} out of {total} successfuly found furigana strings.");
         logger.Info($"Process took {duration}.");
     }
