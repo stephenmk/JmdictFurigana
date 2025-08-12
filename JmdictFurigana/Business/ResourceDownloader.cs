@@ -3,6 +3,7 @@ using System.IO.Compression;
 using System.Net.Http;
 using System.Threading.Tasks;
 using JmdictFurigana.Helpers;
+using NLog;
 
 namespace JmdictFurigana.Business;
 
@@ -13,6 +14,7 @@ public class ResourceDownloader
 {
     // HttpClient is intended to be instantiated once per application, rather than per-use
     private static readonly HttpClient Client = new();
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
     private const string Kanjidic2Uri = "http://www.edrdg.org/kanjidic/kanjidic2.xml.gz";
 
@@ -26,7 +28,9 @@ public class ResourceDownloader
     /// </summary>
     public static async Task Kanjidic()
     {
+        Logger.Info("Starting download of Kanjidic2 file.");
         await DownloadGzFile(Kanjidic2Uri, PathHelper.KanjiDic2Path);
+        Logger.Info("Finished download of Kanjidic2 file.");
     }
 
     /// <summary>
@@ -34,7 +38,9 @@ public class ResourceDownloader
     /// </summary>
     public static async Task Jmdict()
     {
+        Logger.Info("Starting download of Jmdict file.");
         await DownloadGzFile(JmdictUri, PathHelper.JmDictPath);
+        Logger.Info("Finished download of Jmdict file.");
     }
 
     /// <summary>
@@ -42,7 +48,9 @@ public class ResourceDownloader
     /// </summary>
     public static async Task Jmnedict()
     {
+        Logger.Info("Starting download of Jmnedict file.");
         await DownloadGzFile(JmnedictUri, PathHelper.JmneDictPath);
+        Logger.Info("Finished download of Jmnedict file.");
     }
 
     /// <summary>

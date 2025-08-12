@@ -95,7 +95,7 @@ class FuriganaFileWriter(string outputPath)
 
         var duration = DateTime.Now - start;
         logger.Info($"Successfuly ended process with {success} out of {total} successfuly found furigana strings.");
-        logger.Info($"Process took {duration}.");
+        logger.Info($"Process took {double.Round(duration.TotalSeconds, 1)} seconds.");
     }
 }
 
