@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -8,6 +9,7 @@ public class KanjiForm
 {
     public string Text;
     public List<string> InfoTags = [];
+    public bool IsHidden => InfoTags.Any(tag => tag == "sK");
 
     public async static Task<KanjiForm> FromXmlReader(XmlReader reader)
     {

@@ -48,13 +48,14 @@ public class DictionaryEtl(string dictionaryFilePath)
     private static IEnumerable<VocabEntry> VocabEntries(Entry entry)
     {
         var kanjiFormTexts = entry.KanjiForms
-            .Where(k => !k.InfoTags.Any(i => i == "sK"))
+            .Where(k => !k.IsHidden)
             .Select(k => k.Text);
         var readings = entry.Readings
             .Where(r => !r.NoKanji)
-            .Where(r => !r.InfoTags.Any(i => i == "sk"));
+            .Where(r => !r.IsHidden);
         foreach (var reading in readings)
         {
+            var readingText = reading.Text;
             var relevantKanjiFormTexts = reading.ConstraintKanjiFormTexts.Count > 0
                 ? reading.ConstraintKanjiFormTexts
                 : kanjiFormTexts;
@@ -63,7 +64,7 @@ public class DictionaryEtl(string dictionaryFilePath)
                 yield return new VocabEntry
                 {
                     KanjiReading = kanjiFormText,
-                    KanaReading = reading.Text,
+                    KanaReading = readingText,
                 };
             }
         }

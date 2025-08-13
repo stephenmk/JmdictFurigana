@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -10,6 +11,7 @@ public class Reading
     public List<string> InfoTags = [];
     public List<string> ConstraintKanjiFormTexts = [];
     public bool NoKanji = false;
+    public bool IsHidden => InfoTags.Any(tag => tag == "sk");
 
     public async static Task<Reading> FromXmlReader(XmlReader reader)
     {
