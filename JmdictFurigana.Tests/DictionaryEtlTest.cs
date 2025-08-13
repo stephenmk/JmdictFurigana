@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Threading.Tasks;
 using JmdictFurigana.Etl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -10,11 +10,11 @@ namespace JmdictFurigana.Tests;
 public class DictionaryEtlTest
 {
     [TestMethod]
-    public void ExecuteTestWaruguchiFourReadings()
+    public async Task ExecuteTestWaruguchiFourReadings()
     {
-        // Arrange
-        var dictionaryEtl = new DictionaryEtl(Path.Combine("Resources", "Waruguchi.xml"));
-        var wanted = new List<string>()
+        var dictionaryFilePath = Path.Combine("Resources", "Waruguchi.xml");
+        var dictionaryEtl = new DictionaryEtl(dictionaryFilePath);
+        var expectedResults = new List<string>()
         {
             "悪口|あっこう",
             "悪口|わるくち",
@@ -24,11 +24,12 @@ public class DictionaryEtlTest
             "惡口|わるぐち",
         };
 
-        // Act
-        var results = dictionaryEtl.Execute().ToList();
-        var resultsAsStrings = results.Select(r => r.ToString()).ToList();
+        var results = new List<string>();
+        await foreach(var vocabEntry in dictionaryEtl.ExecuteAsync())
+        {
+            results.Add(vocabEntry.ToString());
+        }
 
-        // Assert
-        CollectionAssert.AreEquivalent(wanted, resultsAsStrings);
+        CollectionAssert.AreEquivalent(expectedResults, results);
     }
 }
