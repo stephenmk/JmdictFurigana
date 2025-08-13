@@ -61,9 +61,9 @@ public class ResourceDownloader
     private static async Task DownloadGzFile(string uri, string targetPath)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
-        using var httpStream = await Client.GetStreamAsync(uri);
-        using var gzipStream = new GZipStream(httpStream, CompressionMode.Decompress);
-        using var fileStream = new FileStream(targetPath, FileMode.Create);
-        gzipStream.CopyTo(fileStream);
+        await using var httpStream = await Client.GetStreamAsync(uri);
+        await using var gzipStream = new GZipStream(httpStream, CompressionMode.Decompress);
+        await using var fileStream = new FileStream(targetPath, FileMode.Create);
+        await gzipStream.CopyToAsync(fileStream);
     }
 }
