@@ -98,7 +98,7 @@ public class FuriganaBusiness
 
     public FuriganaSolutionSet Execute(VocabEntry v)
     {
-        if (v.KanjiReading == null || v.KanaReading == null || string.IsNullOrWhiteSpace(v.KanjiReading))
+        if (string.IsNullOrWhiteSpace(v.KanjiReading) || string.IsNullOrWhiteSpace(v.KanaReading))
         {
             // Cannot solve when we do not have a kanji or kana reading.
             return new FuriganaSolutionSet(v);
