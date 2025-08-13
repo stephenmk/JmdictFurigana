@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using NLog;
 using SharpCompress.Common;
 using SharpCompress.Writers;
+using System.Threading.Tasks;
 
 namespace JmdictFurigana.Business;
 
@@ -29,7 +30,7 @@ class FuriganaFileWriter(string outputPath)
     /// </summary>
     public string OutputPath { get; set; } = outputPath;
 
-    public void Write(IEnumerable<FuriganaSolutionSet> solutions)
+    public async Task WriteAsync(IAsyncEnumerable<FuriganaSolutionSet> solutions)
     {
         int success = 0;
         int total = 0;
@@ -45,7 +46,7 @@ class FuriganaFileWriter(string outputPath)
             jsonWriter.WriteStartArray();
             var jsonSerializer = new JsonSerializer();
             jsonSerializer.Converters.Add(new FuriganaSolutionJsonSerializer());
-            foreach (var solution in solutions)
+            await foreach (var solution in solutions)
             {
                 var singleSolution = solution.GetSingleSolution();
 

@@ -27,7 +27,7 @@ public class Program
         var jmdictEtl = new DictionaryEtl(PathHelper.JmDictPath);
         var furiganaJmdict = new FuriganaBusiness(DictionaryFile.Jmdict);
         var jmdictWriter = new FuriganaFileWriter(PathHelper.JmdictOutFilePath);
-        jmdictWriter.Write(furiganaJmdict.Execute(jmdictEtl.Execute()));
+        await jmdictWriter.WriteAsync(furiganaJmdict.ExecuteAsync(jmdictEtl.ExecuteAsync()));
 
         await t3;
 
@@ -35,7 +35,7 @@ public class Program
         var jmnedictEtl = new DictionaryEtl(PathHelper.JmneDictPath);
         var furiganaJmnedict = new FuriganaBusiness(DictionaryFile.Jmnedict);
         var jmnedictWriter = new FuriganaFileWriter(PathHelper.JmnedictOutFilePath);
-        jmnedictWriter.Write(furiganaJmnedict.Execute(jmnedictEtl.Execute()));
+        await jmnedictWriter.WriteAsync(furiganaJmnedict.ExecuteAsync(jmnedictEtl.ExecuteAsync()));
 
         sw.Stop();
         logger.Info($"Finished in {double.Round(sw.Elapsed.TotalSeconds, 1)} seconds.");

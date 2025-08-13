@@ -2,6 +2,8 @@
 using JmdictFurigana.Business.Solvers;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+
 
 namespace JmdictFurigana.Business;
 
@@ -80,11 +82,17 @@ public class FuriganaBusiness
     /// Starts the process of associating a furigana string to vocab.
     /// </summary>
     /// <returns>The furigana vocab entries.</returns>
-    public IEnumerable<FuriganaSolutionSet> Execute(IEnumerable<VocabEntry> vocab)
+    public async IAsyncEnumerable<FuriganaSolutionSet> ExecuteAsync(IAsyncEnumerable<VocabEntry> vocab)
     {
-        foreach (var v in vocab)
+        var processingTasks = new List<Task<FuriganaSolutionSet>>();
+        await foreach (var v in vocab)
         {
-            yield return Execute(v);
+            var task = Task.Run(() => Execute(v));
+            processingTasks.Add(task);
+        }
+        await foreach (var task in Task.WhenEach(processingTasks))
+        {
+            yield return await task;
         }
     }
 
