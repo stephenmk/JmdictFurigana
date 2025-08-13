@@ -15,6 +15,7 @@ public static class PathHelper
     public static readonly string SupplementaryKanjiPath = Path.Combine(ResourcesBasePath, "SupplementaryKanji.txt");
     public static readonly string SpecialReadingsPath = Path.Combine(ResourcesBasePath, "SpecialReadings.txt");
 
-    public static readonly string JmdictOutFilePath = "JmdictFurigana.txt";
-    public static readonly string JmnedictOutFilePath = "JmnedictFurigana.txt";
+    public static readonly string OutputBasePath = "Output";
+    public static readonly string JmdictOutFilePath = Path.Combine(OutputBasePath, "JmdictFurigana.txt");
+    public static readonly string JmnedictOutFilePath = Path.Combine(OutputBasePath, "JmnedictFurigana.txt");
 }

@@ -1,5 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using JmdictFurigana.Business;
 using JmdictFurigana.Etl;
@@ -20,9 +20,14 @@ public class Program
         logger.Info("Fetching resources.");
         var t1 = ResourceDownloader.Kanjidic();
         var t2 = ResourceDownloader.Jmdict();
-        await Task.WhenAll(t1, t2);
         var t3 = ResourceDownloader.Jmnedict();
 
+        if (Directory.Exists(PathHelper.OutputBasePath))
+            logger.Info("Deleting the previously created output directory.");
+            Directory.Delete(PathHelper.OutputBasePath, true);
+        Directory.CreateDirectory(PathHelper.OutputBasePath);
+
+        await Task.WhenAll(t1, t2);
         logger.Info("Starting the JMdict furigana process.");
         var jmdictEtl = new DictionaryEtl(PathHelper.JmDictPath);
         var furiganaJmdict = new FuriganaBusiness(DictionaryFile.Jmdict);
@@ -30,7 +35,6 @@ public class Program
         await jmdictWriter.WriteAsync(furiganaJmdict.ExecuteAsync(jmdictEtl.ExecuteAsync()));
 
         await t3;
-
         logger.Info("Starting the JMnedict furigana process.");
         var jmnedictEtl = new DictionaryEtl(PathHelper.JmneDictPath);
         var furiganaJmnedict = new FuriganaBusiness(DictionaryFile.Jmnedict);

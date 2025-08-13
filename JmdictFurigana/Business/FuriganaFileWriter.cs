@@ -37,11 +37,15 @@ class FuriganaFileWriter(string outputPath)
         var logger = LogManager.GetCurrentClassLogger();
         var start = DateTime.Now;
 
-        string jsonFileName = $"{Path.GetFileNameWithoutExtension(OutputPath)}.json";
+        var outputDirectory = Path.GetDirectoryName(OutputPath);
+        var baseFilename = Path.GetFileNameWithoutExtension(OutputPath);
+        var jsonFilePath = Path.Combine(outputDirectory, $"{baseFilename}.json");
+        var zipFilePath = Path.Combine(outputDirectory, $"{baseFilename}.zip");
+        var tarGzFilePath = Path.Combine(outputDirectory, $"{baseFilename}.tar.gz");
 
-        using (var stream = new StreamWriter(OutputPath, false, Encoding.UTF8))
-        using (var jsonStream = new StreamWriter(jsonFileName, false, Encoding.UTF8))
-        using (var jsonWriter = new JsonTextWriter(jsonStream))
+        await using (var stream = new StreamWriter(OutputPath, false, Encoding.UTF8))
+        await using (var jsonStream = new StreamWriter(jsonFilePath, false, Encoding.UTF8))
+        await using (var jsonWriter = new JsonTextWriter(jsonStream))
         {
             jsonWriter.WriteStartArray();
             var jsonSerializer = new JsonSerializer();
@@ -59,7 +63,7 @@ class FuriganaFileWriter(string outputPath)
 
                 if (singleSolution != null && !AlreadyWritten.Contains(singleSolution.ToString()))
                 {
-                    stream.WriteLine(singleSolution.ToString());
+                    await stream.WriteLineAsync(singleSolution.ToString());
                     AlreadyWritten.Add(singleSolution.ToString());
                     jsonSerializer.Serialize(jsonWriter, singleSolution);
                 }
@@ -69,28 +73,28 @@ class FuriganaFileWriter(string outputPath)
 
                 total++;
             }
-            jsonWriter.WriteEndArray();
+            await jsonWriter.WriteEndArrayAsync();
         }
 
         // Create a zip of the json file
-        using (var zip = ZipFile.Open($"{jsonFileName}.zip", ZipArchiveMode.Create))
+        using (var zip = ZipFile.Open(zipFilePath, ZipArchiveMode.Create))
         {
-            zip.CreateEntryFromFile(jsonFileName, Path.GetFileName(jsonFileName));
+            zip.CreateEntryFromFile(jsonFilePath, Path.GetFileName(jsonFilePath));
         }
 
         // Create a tar of the json file
-        using (var tarStream = new MemoryStream())
+        await using (var tarStream = new MemoryStream())
         {
             // Create a .tar file in the MemoryStream
             using (var tarWriter = WriterFactory.Open(tarStream, ArchiveType.Tar, CompressionType.None))
-                tarWriter.Write(jsonFileName, jsonFileName);
+                tarWriter.Write(jsonFilePath, jsonFilePath);
 
             // Reset the position of the MemoryStream to the beginning
             tarStream.Position = 0;
 
             // Compress the .tar file in the MemoryStream directly into a .tar.gz file
-            using var gzFileStream = File.OpenWrite($"{jsonFileName}.tar.gz");
-            using var gzStream = new GZipStream(gzFileStream, CompressionMode.Compress);
+            await using var gzFileStream = File.OpenWrite(tarGzFilePath);
+            await using var gzStream = new GZipStream(gzFileStream, CompressionMode.Compress);
             tarStream.CopyTo(gzStream);
         }
 
