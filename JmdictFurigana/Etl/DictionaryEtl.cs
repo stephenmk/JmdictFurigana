@@ -1,11 +1,8 @@
 ﻿using JmdictFurigana.Models;
-using JmdictFurigana.Extensions;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Xml;
-using System.Xml.Linq;
 using JmdictFurigana.Etl.DictionaryModels;
 
 
