@@ -32,15 +32,16 @@ public class Program
         var jmdictEtl = new DictionaryEtl(PathHelper.JmDictPath);
         var furiganaJmdict = new FuriganaBusiness(DictionaryFile.Jmdict);
         var jmdictWriter = new FuriganaFileWriter(PathHelper.JmdictOutFilePath);
-        await jmdictWriter.WriteAsync(furiganaJmdict.ExecuteAsync(jmdictEtl.ExecuteAsync()));
+        var t4 = jmdictWriter.WriteAsync(furiganaJmdict.ExecuteAsync(jmdictEtl.ExecuteAsync()));
 
         await t3;
         logger.Info("Starting the JMnedict furigana process.");
         var jmnedictEtl = new DictionaryEtl(PathHelper.JmneDictPath);
         var furiganaJmnedict = new FuriganaBusiness(DictionaryFile.Jmnedict);
         var jmnedictWriter = new FuriganaFileWriter(PathHelper.JmnedictOutFilePath);
-        await jmnedictWriter.WriteAsync(furiganaJmnedict.ExecuteAsync(jmnedictEtl.ExecuteAsync()));
+        var t5 = jmnedictWriter.WriteAsync(furiganaJmnedict.ExecuteAsync(jmnedictEtl.ExecuteAsync()));
 
+        await Task.WhenAll(t4, t5);
         sw.Stop();
         logger.Info($"Finished in {double.Round(sw.Elapsed.TotalSeconds, 1)} seconds.");
     }
