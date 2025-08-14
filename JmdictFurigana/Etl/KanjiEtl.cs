@@ -25,7 +25,7 @@ public class KanjiEtl
         {
             var kanji = new Kanji
             {
-                Character = entry.Literal.First(),
+                Character = entry.Literal.First(), // TODO: Many truncations occurring here. Problem?
                 Readings = entry.ReadingMeaning?
                     .Groups.FirstOrDefault()?  // Currently no entry has more than one.
                     .Readings
