@@ -105,10 +105,12 @@ public class FuriganaTest
         TestFurigana("日独協会", "にちどくきょうかい", "0:にち;1:どく;2:きょう;3:かい");
     }
 
-    public static void TestFurigana(string kanjiReading, string kanaReading, string expectedFurigana)
+    public async static void TestFurigana(string kanjiReading, string kanaReading, string expectedFurigana)
     {
         var v = new VocabEntry(kanjiReading, kanaReading);
-        var business = new FuriganaBusiness(DictionaryFile.Jmdict);
+        var resourceSet = new FuriganaResourceSet();
+        await resourceSet.LoadAsync();
+        var business = new FuriganaBusiness(DictionaryFile.Jmdict, resourceSet);
         var result = business.Execute(v);
 
         if (result.GetSingleSolution() == null)

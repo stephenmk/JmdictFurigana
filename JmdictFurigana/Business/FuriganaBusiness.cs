@@ -15,57 +15,25 @@ public class FuriganaBusiness
     #region Properties
 
     /// <summary>
-    /// Gets or sets the resource set that will be sent to solvers.
+    /// Gets the resource set that will be sent to solvers.
     /// </summary>
-    public FuriganaResourceSet ResourceSet { get; set; }
+    private FuriganaResourceSet ResourceSet { get; }
 
     /// <summary>
-    /// Gets or sets the furigana solver list.
+    /// Gets the furigana solver list.
     /// </summary>
-    public List<FuriganaSolver> Solvers { get; set; }
-
-    /// <summary>
-    /// Gets or sets the dictionary file to use.
-    /// </summary>
-    public DictionaryFile DictionaryFile { get; set; }
+    private List<FuriganaSolver> Solvers { get; }
 
     #endregion
 
     #region Constructors
 
-    public FuriganaBusiness(DictionaryFile dictionaryFile)
-    {
-        DictionaryFile = dictionaryFile;
-        Initialize();
-    }
-
     public FuriganaBusiness(DictionaryFile dictionaryFile, FuriganaResourceSet resourceSet)
-        : this(dictionaryFile)
     {
         ResourceSet = resourceSet;
-    }
-
-    public FuriganaBusiness(DictionaryFile dictionaryFile, FuriganaResourceSet resourceSet, List<FuriganaSolver> solvers)
-        : this(dictionaryFile, resourceSet)
-    {
-        Solvers = solvers;
-    }
-
-    #endregion
-
-    #region Methods
-
-    protected void Initialize()
-    {
-        if (ResourceSet == null)
-        {
-            ResourceSet = new FuriganaResourceSet();
-            ResourceSet.Load();
-        }
-
-        Solvers ??= [
+        Solvers = [
             new KanaReadingSolver(),
-            new KanjiReadingSolver(useNanori: DictionaryFile == DictionaryFile.Jmnedict),
+            new KanjiReadingSolver(useNanori: dictionaryFile == DictionaryFile.Jmnedict),
             new LengthMatchSolver(),
             new NoConsecutiveKanjiSolver(),
             new OverrideSolver(),
@@ -73,10 +41,13 @@ public class FuriganaBusiness
             new SingleCharacterSolver(),
             new SingleKanjiSolver(),
         ];
-
         Solvers.Sort();
         Solvers.Reverse();
     }
+
+    #endregion
+
+    #region Methods
 
     /// <summary>
     /// Starts the process of associating a furigana string to vocab.

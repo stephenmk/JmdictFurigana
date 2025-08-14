@@ -4,77 +4,76 @@ using JmdictFurigana.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace JmdictFurigana.Business;
 
 public class FuriganaResourceSet
 {
-    #region Fields
-
-    private Dictionary<char, Kanji> _kanjiDictionary;
-    private Dictionary<string, FuriganaSolution> _overrideList;
-    private Dictionary<string, SpecialExpression> _specialExpressions;
-
-    #endregion
-
-    #region Constructors
-
-    public FuriganaResourceSet()
-    {
-        _kanjiDictionary = [];
-        _overrideList = [];
-        _specialExpressions = [];
-    }
-
-    #endregion
+    private Dictionary<char, Kanji> _kanjiDictionary = [];
+    private Dictionary<string, FuriganaSolution> _overrideList = [];
+    private Dictionary<string, SpecialExpression> _specialExpressions = [];
 
     #region Methods
-
 
     #region Loading
 
     /// <summary>
     /// Loads the resources. Should be done before using any accessor method.
     /// </summary>
-    public void Load()
+    public async Task LoadAsync()
     {
-        LoadKanjiDictionary();
-        LoadOverrideList();
-        LoadSpecialExpressions();
+        var t1 = LoadKanjiDictionaryAsync();
+        var t2 = LoadOverrideListAsync();
+        var t3 = LoadSpecialExpressionsAsync();
+        await Task.WhenAll(t1, t2, t3);
+    }
+
+    /// <summary>
+    /// Loads the kanji dictionary using resource files.
+    /// </summary>
+    private async Task LoadKanjiDictionaryAsync()
+    {
+        _kanjiDictionary = [];
+        await foreach (var kanji in KanjiEtl.ExecuteAsync())
+        {
+            AddKanjiEntry(kanji);
+        }
     }
 
     /// <summary>
     /// Loads the furigana override list.
     /// </summary>
-    private void LoadOverrideList()
+    private async Task LoadOverrideListAsync()
     {
         _overrideList = [];
-        foreach (string line in File.ReadAllLines(PathHelper.OverrideFuriganaPath))
+        await foreach (string line in File.ReadLinesAsync(PathHelper.OverrideFuriganaPath))
         {
             if (string.IsNullOrWhiteSpace(line) || line.First() == ';')
                 continue;
-
-            string[] split = line.Split(SeparatorHelper.FileFieldSeparator);
-            _overrideList.Add(new VocabEntry(split[0], split[1]).ToString(), FuriganaSolution.Parse(split[2], null));
+            var split = line.Split(SeparatorHelper.FileFieldSeparator);
+            var vocab = new VocabEntry(split[0], split[1]);
+            var solution = FuriganaSolution.Parse(split[2], null);
+            _overrideList.Add(vocab.ToString(), solution);
         }
     }
 
     /// <summary>
     /// Loads the special expressions dictionary.
     /// </summary>
-    private void LoadSpecialExpressions()
+    private async Task LoadSpecialExpressionsAsync()
     {
         _specialExpressions = [];
-        foreach (string line in File.ReadAllLines(PathHelper.SpecialReadingsPath))
+        await foreach (string line in File.ReadLinesAsync(PathHelper.SpecialReadingsPath))
         {
             if (string.IsNullOrWhiteSpace(line) || line.First() == ';')
                 continue;
 
-            string[] split = line.Split(SeparatorHelper.FileFieldSeparator);
-            string kanjiReading = split[0];
-            string kanaReading = split[1];
+            var split = line.Split(SeparatorHelper.FileFieldSeparator);
+            var kanjiReading = split[0];
+            var kanaReading = split[1];
 
-            VocabEntry v = new(kanjiReading, kanaReading);
+            var v = new VocabEntry(kanjiReading, kanaReading);
 
             // Read the solution if it is explicitly written. Compute it otherwise.
             var solution = split.Length == 3 ?
@@ -91,18 +90,6 @@ public class FuriganaResourceSet
             {
                 _specialExpressions.Add(kanjiReading, new SpecialExpression(kanjiReading, specialReading));
             }
-        }
-    }
-
-    /// <summary>
-    /// Loads the kanji dictionary using resource files.
-    /// </summary>
-    private void LoadKanjiDictionary()
-    {
-        _kanjiDictionary = [];
-        foreach (var kanji in KanjiEtl.Execute())
-        {
-            AddKanjiEntry(kanji);
         }
     }
 

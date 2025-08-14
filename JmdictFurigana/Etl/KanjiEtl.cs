@@ -1,9 +1,11 @@
-﻿using JmdictFurigana.Helpers;
-using JmdictFurigana.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
+using System.Threading.Tasks;
+using System.Xml;
+using JmdictFurigana.Etl.KanjiModels;
+using JmdictFurigana.Helpers;
+using JmdictFurigana.Models;
 
 namespace JmdictFurigana.Etl;
 
@@ -12,48 +14,23 @@ namespace JmdictFurigana.Etl;
 /// </summary>
 public class KanjiEtl
 {
-    #region Constants
-
-    private static readonly string XmlNode_Character = "character";
-    private static readonly string XmlNode_Literal = "literal";
-    private static readonly string XmlNode_ReadingMeaning = "reading_meaning";
-    private static readonly string XmlNode_ReadingMeaningGroup = "rmgroup";
-    private static readonly string XmlNode_Reading = "reading";
-    private static readonly string XmlNode_Nanori = "nanori";
-
-    private static readonly string XmlAttribute_ReadingType = "r_type";
-
-    private static readonly string XmlAttributeValue_KunYomiReading = "ja_kun";
-    private static readonly string XmlAttributeValue_OnYomiReading = "ja_on";
-
-    #endregion
-
-    #region Methods
-
     /// <summary>
     /// Reads and returns Kanji models.
     /// </summary>
-    public static IEnumerable<Kanji> Execute()
+    public async static IAsyncEnumerable<Kanji> ExecuteAsync()
     {
-        var supplementaryKanjis = SupplementaryKanjis();
+        var supplementaryKanjis = await LoadSupplementaryKanjisAsync(PathHelper.SupplementaryKanjiPath);
 
-        var validReadingAttrs = new HashSet<string> {
-            XmlAttributeValue_OnYomiReading,
-            XmlAttributeValue_KunYomiReading,
-        };
-
-        var xdoc = XDocument.Load(PathHelper.KanjiDic2Path);
-
-        foreach (var xkanji in xdoc.Root.Elements(XmlNode_Character))
+        await foreach (var entry in LoadKanjidicEntriesAsync(PathHelper.KanjiDic2Path))
         {
-            var xreadingMeaning = xkanji.Element(XmlNode_ReadingMeaning);
             var kanji = new Kanji
             {
-                Character = xkanji.Element(XmlNode_Literal).Value.First(),
-                Readings = xreadingMeaning?.Element(XmlNode_ReadingMeaningGroup)?
-                    .Elements(XmlNode_Reading)
-                    .Where(r => validReadingAttrs.Contains(r.Attribute(XmlAttribute_ReadingType).Value))
-                    .Select(r => KanaHelper.ToHiragana(r.Value))
+                Character = entry.Literal.First(),
+                Readings = entry.ReadingMeaning?
+                    .Groups.FirstOrDefault()?
+                    .Readings
+                    .Where(r => r.IsJapanese)
+                    .Select(r => KanaHelper.ToHiragana(r.Text))
                     .ToList() ?? []
             };
 
@@ -67,15 +44,11 @@ public class KanjiEtl
             }
 
             // Read the nanori readings
-            var nanoriReadings = xreadingMeaning?.Elements(XmlNode_Nanori)
-                .Select(n => n.Value)
-                .ToList() ?? [];
+            var nanoriReadings = entry.ReadingMeaning?.Nanori ?? [];
             kanji.ReadingsWithNanori = kanji.Readings.Union(nanoriReadings).Distinct().ToList();
 
             // Return the kanji read and go to the next kanji node.
             yield return kanji;
-
-            xkanji.RemoveAll();
         }
 
         // Return the remaining supplementary kanji as new kanji.
@@ -85,10 +58,10 @@ public class KanjiEtl
         }
     }
 
-    private static List<Kanji> SupplementaryKanjis()
+    private async static Task<List<Kanji>> LoadSupplementaryKanjisAsync(string path)
     {
         var supplementaryKanjis = new List<Kanji>();
-        foreach (string line in File.ReadAllLines(PathHelper.SupplementaryKanjiPath))
+        await foreach (var line in File.ReadLinesAsync(path))
         {
             if (string.IsNullOrWhiteSpace(line) || line.First() == ';')
                 continue;
@@ -102,11 +75,37 @@ public class KanjiEtl
                 Character = c,
                 Readings = [.. readings],
                 ReadingsWithNanori = [.. readings],
-                IsRealKanji = false
+                IsRealKanji = false,
             };
             supplementaryKanjis.Add(kanji);
         }
         return supplementaryKanjis;
     }
-    #endregion
+
+    private async static IAsyncEnumerable<Entry> LoadKanjidicEntriesAsync(string path)
+    {
+        await using var stream = File.OpenRead(path);
+
+        var readerSettings = new XmlReaderSettings
+        {
+            Async = true,
+            DtdProcessing = DtdProcessing.Parse,
+            MaxCharactersFromEntities = long.MaxValue,
+            MaxCharactersInDocument = long.MaxValue,
+        };
+
+        using var reader = XmlReader.Create(stream, readerSettings);
+
+        while (await reader.ReadAsync())
+        {
+            if (reader.NodeType == XmlNodeType.Element)
+            {
+                if (reader.Name == Entry.XmlElementName)
+                {
+                    var entry = await Entry.FromXmlReader(reader);
+                    yield return entry;
+                }
+            }
+        }
+    }
 }

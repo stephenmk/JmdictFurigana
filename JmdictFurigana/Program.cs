@@ -27,21 +27,26 @@ public class Program
             Directory.Delete(PathHelper.OutputBasePath, true);
         Directory.CreateDirectory(PathHelper.OutputBasePath);
 
-        await Task.WhenAll(t1, t2);
+        await t1;
+        logger.Info("Loading kanji data from Kanjidic2.");
+        var resourceSet = new FuriganaResourceSet();
+        var t4 = resourceSet.LoadAsync();
+
+        await Task.WhenAll(t2, t4);
         logger.Info("Starting the JMdict furigana process.");
         var jmdictEtl = new DictionaryEtl(PathHelper.JmDictPath);
-        var furiganaJmdict = new FuriganaBusiness(DictionaryFile.Jmdict);
+        var furiganaJmdict = new FuriganaBusiness(DictionaryFile.Jmdict, resourceSet);
         var jmdictWriter = new FuriganaFileWriter(PathHelper.JmdictOutFilePath);
-        var t4 = jmdictWriter.WriteAsync(furiganaJmdict.ExecuteAsync(jmdictEtl.ExecuteAsync()));
+        var t5 = jmdictWriter.WriteAsync(furiganaJmdict.ExecuteAsync(jmdictEtl.ExecuteAsync()));
 
         await t3;
         logger.Info("Starting the JMnedict furigana process.");
         var jmnedictEtl = new DictionaryEtl(PathHelper.JmneDictPath);
-        var furiganaJmnedict = new FuriganaBusiness(DictionaryFile.Jmnedict);
+        var furiganaJmnedict = new FuriganaBusiness(DictionaryFile.Jmnedict, resourceSet);
         var jmnedictWriter = new FuriganaFileWriter(PathHelper.JmnedictOutFilePath);
-        var t5 = jmnedictWriter.WriteAsync(furiganaJmnedict.ExecuteAsync(jmnedictEtl.ExecuteAsync()));
+        var t6 = jmnedictWriter.WriteAsync(furiganaJmnedict.ExecuteAsync(jmnedictEtl.ExecuteAsync()));
 
-        await Task.WhenAll(t4, t5);
+        await Task.WhenAll(t5, t6);
         sw.Stop();
         logger.Info($"Finished in {double.Round(sw.Elapsed.TotalSeconds, 1)} seconds.");
     }
