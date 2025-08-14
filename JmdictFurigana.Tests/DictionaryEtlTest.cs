@@ -21,7 +21,7 @@ public class DictionaryEtlTest
             あっこう[悪口,惡口]；わるくち；わるぐち；あかくち[nokanji]；あかぐち[sk]
 
             The reading あっこう is restricted to forms 悪口 and 惡口.
-            The kanji form 悪ぐち is hidden therefore has no associated readings.
+            The kanji form 悪ぐち is hidden and therefore has no associated readings.
             The kana form あかくち is tagged "nokanji" and therefore has no associated kanji forms.
             The kana form あかぐち is hidden and therefore has no associated kanji forms.
         */
