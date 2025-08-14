@@ -13,6 +13,8 @@ namespace JmdictFurigana.Tests;
 [TestClass]
 public class FuriganaTest
 {
+    private static readonly FuriganaResourceSet resourceSet = new();
+
     /// <summary>
     /// Downloads missing resources.
     /// </summary>
@@ -21,61 +23,62 @@ public class FuriganaTest
     {
         if (!File.Exists(PathHelper.KanjiDic2Path))
             await ResourceDownloader.Kanjidic();
+        await resourceSet.LoadAsync();
     }
 
     [TestMethod]
-    public async Task TestFuriganaGanbaruAsync()
+    public void TestFuriganaGanbaru()
     {
-        await TestFuriganaAsync("頑張る", "がんばる", "0:がん;1:ば");
+        TestFurigana("頑張る", "がんばる", "0:がん;1:ば");
     }
 
     [TestMethod]
-    public async Task TestFuriganaIkkagetsuAsync()
+    public void TestFuriganaIkkagetsu()
     {
-        await TestFuriganaAsync("一ヶ月", "いっかげつ", "0:いっ;1:か;2:げつ");
+        TestFurigana("一ヶ月", "いっかげつ", "0:いっ;1:か;2:げつ");
     }
 
     [TestMethod]
-    public async Task TestFuriganaObocchanAsync()
+    public void TestFuriganaObocchan()
     {
-        await TestFuriganaAsync("御坊っちゃん", "おぼっちゃん", "0:お;1:ぼ");
+        TestFurigana("御坊っちゃん", "おぼっちゃん", "0:お;1:ぼ");
     }
 
     [TestMethod]
     [Ignore]
-    public async Task TestFuriganaAraAsync()
+    public void TestFuriganaAra()
     {
         // Will fail. This is a weird kanji. The string containing only the kanji is Length == 2.
         // Would be cool to find a solution but don't worry too much about it.
-        await TestFuriganaAsync("𩺊", "あら", "0:あら");
+        TestFurigana("𩺊", "あら", "0:あら");
     }
 
     [TestMethod]
-    public async Task TestFuriganaIjirimawasuAsync()
+    public void TestFuriganaIjirimawasu()
     {
-        await TestFuriganaAsync("弄り回す", "いじりまわす", "0:いじ;2:まわ");
+        TestFurigana("弄り回す", "いじりまわす", "0:いじ;2:まわ");
     }
 
     [TestMethod]
-    public async Task TestFuriganaKassarauAsync()
+    public void TestFuriganaKassarau()
     {
-        await TestFuriganaAsync("掻っ攫う", "かっさらう", "0:か;2:さら");
+        TestFurigana("掻っ攫う", "かっさらう", "0:か;2:さら");
     }
 
     [TestMethod]
-    public async Task TestFuriganaOneesanAsync()
+    public void TestFuriganaOneesan()
     {
-        await TestFuriganaAsync("御姉さん", "おねえさん", "0:お;1:ねえ");
+        TestFurigana("御姉さん", "おねえさん", "0:お;1:ねえ");
     }
 
     [TestMethod]
-    public async Task TestFuriganaHakabakashiiAsync()
+    public void TestFuriganaHakabakashii()
     {
-        await TestFuriganaAsync("捗捗しい", "はかばかしい", "0:はか;1:ばか");
+        TestFurigana("捗捗しい", "はかばかしい", "0:はか;1:ばか");
     }
 
     [TestMethod]
-    public async Task TestFuriganaIssue5Async()
+    public void TestFuriganaIssue5()
     {
         var testData = new List<(string, string, string)>
         {
@@ -109,15 +112,13 @@ public class FuriganaTest
         };
         foreach (var x in testData)
         {
-            await TestFuriganaAsync(x.Item1, x.Item2, x.Item3);
+            TestFurigana(x.Item1, x.Item2, x.Item3);
         }
     }
 
-    public async static Task TestFuriganaAsync(string kanjiReading, string kanaReading, string expectedFurigana)
+    public static void TestFurigana(string kanjiReading, string kanaReading, string expectedFurigana)
     {
         var v = new VocabEntry(kanjiReading, kanaReading);
-        var resourceSet = new FuriganaResourceSet();
-        await resourceSet.LoadAsync();
         var business = new FuriganaBusiness(DictionaryFile.Jmdict, resourceSet);
         var result = business.Execute(v);
 
