@@ -33,7 +33,7 @@ public class DictionaryEtl(string dictionaryFilePath)
         {
             if (reader.NodeType == XmlNodeType.Element)
             {
-                if (reader.Name == "entry")
+                if (reader.Name == Entry.XmlElementName)
                 {
                     var entry = await Entry.FromXmlReader(reader);
                     foreach (var vocabEntry in VocabEntries(entry))
