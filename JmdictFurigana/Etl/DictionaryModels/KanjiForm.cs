@@ -12,7 +12,7 @@ public class KanjiForm
     public bool IsHidden => InfoTags.Any(tag => tag == "sK");
     public static readonly string XmlElementName = "k_ele";
 
-    public async static Task<KanjiForm> FromXmlReader(XmlReader reader)
+    public async static Task<KanjiForm> FromXmlReader(XmlReader reader, DocumentMetadata docMeta)
     {
         var kanjiForm = new KanjiForm();
         string currentElementName = XmlElementName;
@@ -31,7 +31,8 @@ public class KanjiForm
                 }
                 else if (currentElementName == "ke_inf")
                 {
-                    kanjiForm.InfoTags.Add(text);
+                    var tag = docMeta.EntityValueToName[text];
+                    kanjiForm.InfoTags.Add(tag);
                 }
             }
             else if (reader.NodeType == XmlNodeType.EndElement)

@@ -14,7 +14,7 @@ public class Reading
     public bool IsHidden => InfoTags.Any(tag => tag == "sk");
     public static readonly string XmlElementName = "r_ele";
 
-    public async static Task<Reading> FromXmlReader(XmlReader reader)
+    public async static Task<Reading> FromXmlReader(XmlReader reader, DocumentMetadata docMeta)
     {
         var reading = new Reading();
         string currentElementName = XmlElementName;
@@ -37,7 +37,8 @@ public class Reading
                 }
                 else if (currentElementName == "re_inf")
                 {
-                    reading.InfoTags.Add(text);
+                    var tag = docMeta.EntityValueToName[text];
+                    reading.InfoTags.Add(tag);
                 }
                 else if (currentElementName == "re_restr")
                 {

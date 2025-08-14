@@ -10,7 +10,7 @@ public class Entry
     public List<Reading> Readings = [];
     public static readonly string XmlElementName = "entry";
 
-    public async static Task<Entry> FromXmlReader(XmlReader reader)
+    public async static Task<Entry> FromXmlReader(XmlReader reader, DocumentMetadata docMeta)
     {
         var entry = new Entry();
         string currentElementName;
@@ -21,12 +21,12 @@ public class Entry
                 currentElementName = reader.Name;
                 if (currentElementName == KanjiForm.XmlElementName)
                 {
-                    var kanjiForm = await KanjiForm.FromXmlReader(reader);
+                    var kanjiForm = await KanjiForm.FromXmlReader(reader, docMeta);
                     entry.KanjiForms.Add(kanjiForm);
                 }
                 else if (currentElementName == Reading.XmlElementName)
                 {
-                    var reading = await Reading.FromXmlReader(reader);
+                    var reading = await Reading.FromXmlReader(reader, docMeta);
                     entry.Readings.Add(reading);
                 }
             }

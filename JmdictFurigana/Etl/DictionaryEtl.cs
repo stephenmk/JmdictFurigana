@@ -5,16 +5,15 @@ using System.Linq;
 using System.Xml;
 using JmdictFurigana.Etl.DictionaryModels;
 
-
 namespace JmdictFurigana.Etl;
 
 /// <summary>
 /// Parses the dictionary file and produces VocabEntry model instances.
 /// </summary>
-public class DictionaryEtl(string dictionaryFilePath)
+public partial class DictionaryEtl(string dictionaryFilePath)
 {
     public string DictionaryFilePath { get; set; } = dictionaryFilePath;
-
+    
     public async IAsyncEnumerable<VocabEntry> ExecuteAsync()
     {
         await using var stream = File.OpenRead(DictionaryFilePath);
@@ -28,14 +27,19 @@ public class DictionaryEtl(string dictionaryFilePath)
         };
 
         using var reader = XmlReader.Create(stream, readerSettings);
+        DocumentMetadata docMeta = null;
 
         while (await reader.ReadAsync())
         {
-            if (reader.NodeType == XmlNodeType.Element)
+            if (reader.NodeType == XmlNodeType.DocumentType)
+            {
+                docMeta = await DocumentMetadata.FromXmlReader(reader);
+            }
+            else if (reader.NodeType == XmlNodeType.Element)
             {
                 if (reader.Name == Entry.XmlElementName)
                 {
-                    var entry = await Entry.FromXmlReader(reader);
+                    var entry = await Entry.FromXmlReader(reader, docMeta);
                     foreach (var vocabEntry in VocabEntries(entry))
                     {
                         yield return vocabEntry;

@@ -20,6 +20,8 @@ public class DictionaryEtlTest
             "惡口|あっこう",
             "惡口|わるくち",
             "惡口|わるぐち",
+            "わる口|わるくち",
+            "わる口|わるぐち",
         };
         var dictionaryFilePath = Path.Combine("Resources", "Waruguchi.xml");
         var dictionaryEtl = new DictionaryEtl(dictionaryFilePath);
