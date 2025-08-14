@@ -8,6 +8,7 @@ public class Entry
 {
     public List<KanjiForm> KanjiForms = [];
     public List<Reading> Readings = [];
+    public static readonly string XmlElementName = "entry";
 
     public async static Task<Entry> FromXmlReader(XmlReader reader)
     {
@@ -18,12 +19,12 @@ public class Entry
             if (reader.NodeType == XmlNodeType.Element)
             {
                 currentElementName = reader.Name;
-                if (currentElementName == "k_ele")
+                if (currentElementName == KanjiForm.XmlElementName)
                 {
                     var kanjiForm = await KanjiForm.FromXmlReader(reader);
                     entry.KanjiForms.Add(kanjiForm);
                 }
-                else if (currentElementName == "r_ele")
+                else if (currentElementName == Reading.XmlElementName)
                 {
                     var reading = await Reading.FromXmlReader(reader);
                     entry.Readings.Add(reading);
@@ -31,7 +32,7 @@ public class Entry
             }
             else if (reader.NodeType == XmlNodeType.EndElement)
             {
-                if (reader.Name == "entry")
+                if (reader.Name == XmlElementName)
                 {
                     break;
                 }

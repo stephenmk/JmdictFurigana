@@ -12,11 +12,12 @@ public class Reading
     public List<string> ConstraintKanjiFormTexts = [];
     public bool NoKanji = false;
     public bool IsHidden => InfoTags.Any(tag => tag == "sk");
+    public static readonly string XmlElementName = "r_ele";
 
     public async static Task<Reading> FromXmlReader(XmlReader reader)
     {
         var reading = new Reading();
-        string currentElementName = null;
+        string currentElementName = XmlElementName;
         while (await reader.ReadAsync())
         {
             if (reader.NodeType == XmlNodeType.Element)
@@ -45,7 +46,7 @@ public class Reading
             }
             else if (reader.NodeType == XmlNodeType.EndElement)
             {
-                if (reader.Name == "r_ele")
+                if (reader.Name == XmlElementName)
                 {
                     break;
                 }

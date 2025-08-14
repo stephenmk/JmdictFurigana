@@ -10,11 +10,12 @@ public class KanjiForm
     public string Text;
     public List<string> InfoTags = [];
     public bool IsHidden => InfoTags.Any(tag => tag == "sK");
+    public static readonly string XmlElementName = "k_ele";
 
     public async static Task<KanjiForm> FromXmlReader(XmlReader reader)
     {
         var kanjiForm = new KanjiForm();
-        string currentElementName = null;
+        string currentElementName = XmlElementName;
         while (await reader.ReadAsync())
         {
             if (reader.NodeType == XmlNodeType.Element)
@@ -25,13 +26,17 @@ public class KanjiForm
             {
                 var text = await reader.GetValueAsync();
                 if (currentElementName == "keb")
+                {
                     kanjiForm.Text = text;
+                }
                 else if (currentElementName == "ke_inf")
+                {
                     kanjiForm.InfoTags.Add(text);
+                }
             }
             else if (reader.NodeType == XmlNodeType.EndElement)
             {
-                if (reader.Name == "k_ele")
+                if (reader.Name == XmlElementName)
                 {
                     break;
                 }
