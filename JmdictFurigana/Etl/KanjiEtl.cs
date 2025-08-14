@@ -27,27 +27,24 @@ public class KanjiEtl
             {
                 Character = entry.Literal.First(),
                 Readings = entry.ReadingMeaning?
-                    .Groups.FirstOrDefault()?
+                    .Groups.FirstOrDefault()?  // Currently no entry has more than one.
                     .Readings
                     .Where(r => r.IsJapanese)
                     .Select(r => KanaHelper.ToHiragana(r.Text))
                     .ToList() ?? []
             };
 
-            // See if there's a supplementary entry for this kanji.
             var supp = supplementaryKanjis.FirstOrDefault(k => k.Character == kanji.Character);
             if (supp != null)
             {
-                // Supplementary entry found. Remove it from the list and add its readings to our current entry.
+                // Merge the supplementary kanji info and remove it from the supplement list.
                 kanji.Readings.AddRange(supp.Readings);
                 supplementaryKanjis.Remove(supp);
             }
 
-            // Read the nanori readings
             var nanoriReadings = entry.ReadingMeaning?.Nanori ?? [];
             kanji.ReadingsWithNanori = kanji.Readings.Union(nanoriReadings).Distinct().ToList();
 
-            // Return the kanji read and go to the next kanji node.
             yield return kanji;
         }
 
