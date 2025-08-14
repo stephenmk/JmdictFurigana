@@ -53,7 +53,7 @@ public static class ReadingExpander
         'つ',
         'く',
         'き',
-        'ち'
+        'ち',
     ];
 
     /// <summary>
