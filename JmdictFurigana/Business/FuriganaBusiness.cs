@@ -116,7 +116,8 @@ public class FuriganaBusiness
             }
 
             // Add all solutions if they are correct and unique.
-            solutionSet.SafeAdd(solver.Solve(ResourceSet, v));
+            var solution = solver.Solve(ResourceSet, v);
+            solutionSet.SafeAdd(solution);
         }
 
         return solutionSet;
