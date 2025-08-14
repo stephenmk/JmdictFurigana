@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using JmdictFurigana.Business;
-using JmdictFurigana.Helpers;
 using JmdictFurigana.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
