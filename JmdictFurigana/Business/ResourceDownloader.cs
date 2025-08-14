@@ -28,6 +28,8 @@ public class ResourceDownloader
     /// </summary>
     public static async Task Kanjidic()
     {
+        if (File.Exists(PathHelper.KanjiDic2Path))
+            return;
         Logger.Info("Starting download of Kanjidic2 file.");
         await DownloadGzFile(Kanjidic2Uri, PathHelper.KanjiDic2Path);
         Logger.Info("Finished download of Kanjidic2 file.");
@@ -38,6 +40,8 @@ public class ResourceDownloader
     /// </summary>
     public static async Task Jmdict()
     {
+        if (File.Exists(PathHelper.JmDictPath))
+            return;
         Logger.Info("Starting download of Jmdict file.");
         await DownloadGzFile(JmdictUri, PathHelper.JmDictPath);
         Logger.Info("Finished download of Jmdict file.");
@@ -48,6 +52,8 @@ public class ResourceDownloader
     /// </summary>
     public static async Task Jmnedict()
     {
+        if (File.Exists(PathHelper.JmneDictPath))
+            return;
         Logger.Info("Starting download of Jmnedict file.");
         await DownloadGzFile(JmnedictUri, PathHelper.JmneDictPath);
         Logger.Info("Finished download of Jmnedict file.");
