@@ -23,8 +23,10 @@ public class Program
         var t3 = ResourceDownloader.Jmnedict();
 
         if (Directory.Exists(PathHelper.OutputBasePath))
+        {
             logger.Info("Deleting the previously created output directory.");
             Directory.Delete(PathHelper.OutputBasePath, true);
+        }
         Directory.CreateDirectory(PathHelper.OutputBasePath);
 
         await t1;
