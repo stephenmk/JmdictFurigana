@@ -12,12 +12,12 @@ public class Reading
     public bool IsJapanese => Type == ReadingType.JapaneseOn || Type == ReadingType.JapaneseKun;
     private static readonly Dictionary<string, ReadingType> AttributeToType = new()
     {
-        {"pinyin", ReadingType.Pinyin},
-        {"korean_r", ReadingType.KoreanRomanized},
-        {"korean_h", ReadingType.KoreanHangul},
-        {"vietnam", ReadingType.Vietnamese},
-        {"ja_on", ReadingType.JapaneseOn},
-        {"ja_kun", ReadingType.JapaneseKun},
+        ["pinyin"] = ReadingType.Pinyin,
+        ["korean_r"] = ReadingType.KoreanRomanized,
+        ["korean_h"] = ReadingType.KoreanHangul,
+        ["vietnam"] = ReadingType.Vietnamese,
+        ["ja_on"] = ReadingType.JapaneseOn,
+        ["ja_kun"] = ReadingType.JapaneseKun,
     };
 
     public async static Task<Reading> FromXmlReader(XmlReader reader)
