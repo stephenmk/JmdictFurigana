@@ -13,7 +13,7 @@ public class Meaning
     {
         var meaning = new Meaning()
         {
-            Language = reader.GetAttribute("m_lang")
+            Language = reader.GetAttribute("m_lang") ?? "en"
         };
 
         string currentElementName = XmlElementName;
