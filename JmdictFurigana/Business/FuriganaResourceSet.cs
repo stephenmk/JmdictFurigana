@@ -21,9 +21,9 @@ public class FuriganaResourceSet
     /// <summary>
     /// Loads the resources. Should be done before using any accessor method.
     /// </summary>
-    public async Task LoadAsync()
+    public async Task LoadAsync(string kanjiDictionaryPath)
     {
-        var t1 = LoadKanjiDictionaryAsync();
+        var t1 = LoadKanjiDictionaryAsync(kanjiDictionaryPath);
         var t2 = LoadOverrideListAsync();
         var t3 = LoadSpecialExpressionsAsync();
         await Task.WhenAll(t1, t2, t3);
@@ -32,10 +32,10 @@ public class FuriganaResourceSet
     /// <summary>
     /// Loads the kanji dictionary using resource files.
     /// </summary>
-    private async Task LoadKanjiDictionaryAsync()
+    private async Task LoadKanjiDictionaryAsync(string path)
     {
         _kanjiDictionary = [];
-        await foreach (var kanji in KanjiEtl.ExecuteAsync())
+        await foreach (var kanji in KanjiEtl.ExecuteAsync(path))
         {
             AddKanjiEntry(kanji);
         }

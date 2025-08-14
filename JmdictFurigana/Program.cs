@@ -32,7 +32,7 @@ public class Program
         await t1;
         logger.Info("Loading kanji data from Kanjidic2.");
         var resourceSet = new FuriganaResourceSet();
-        var t4 = resourceSet.LoadAsync();
+        var t4 = resourceSet.LoadAsync(PathHelper.KanjiDic2Path);
 
         await Task.WhenAll(t2, t4);
         logger.Info("Starting the JMdict furigana process.");

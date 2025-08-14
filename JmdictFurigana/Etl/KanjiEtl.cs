@@ -17,11 +17,11 @@ public class KanjiEtl
     /// <summary>
     /// Reads and returns Kanji models.
     /// </summary>
-    public async static IAsyncEnumerable<Kanji> ExecuteAsync()
+    public async static IAsyncEnumerable<Kanji> ExecuteAsync(string kanjidicPath)
     {
         var supplementaryKanjis = await LoadSupplementaryKanjisAsync(PathHelper.SupplementaryKanjiPath);
 
-        await foreach (var entry in LoadKanjidicEntriesAsync(PathHelper.KanjiDic2Path))
+        await foreach (var entry in LoadKanjidicEntriesAsync(kanjidicPath))
         {
             var kanji = new Kanji
             {

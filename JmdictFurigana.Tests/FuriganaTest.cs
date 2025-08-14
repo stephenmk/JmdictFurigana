@@ -19,9 +19,8 @@ public class FuriganaTest
     [TestInitialize]
     public async Task Initialize()
     {
-        if (!File.Exists(PathHelper.KanjiDic2Path))
-            await ResourceDownloader.Kanjidic();
-        await resourceSet.LoadAsync();
+        var kanjidicPath = Path.Combine("Resources", "TestKanji.xml");
+        await resourceSet.LoadAsync(kanjidicPath);
     }
 
     [TestMethod]
