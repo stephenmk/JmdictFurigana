@@ -1,5 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using JmdictFurigana.Business;
 using JmdictFurigana.Helpers;
 using JmdictFurigana.Models;
@@ -14,98 +17,103 @@ public class FuriganaTest
     /// Downloads missing resources.
     /// </summary>
     [TestInitialize]
-    public async void Initialize()
+    public async Task Initialize()
     {
         if (!File.Exists(PathHelper.KanjiDic2Path))
             await ResourceDownloader.Kanjidic();
-        if (!File.Exists(PathHelper.JmDictPath))
-            await ResourceDownloader.Jmdict();
     }
 
     [TestMethod]
-    public void TestFuriganaGanbaru()
+    public async Task TestFuriganaGanbaruAsync()
     {
-        TestFurigana("頑張る", "がんばる", "0:がん;1:ば");
+        await TestFuriganaAsync("頑張る", "がんばる", "0:がん;1:ば");
     }
 
     [TestMethod]
-    public void TestFuriganaIkkagetsu()
+    public async Task TestFuriganaIkkagetsuAsync()
     {
-        TestFurigana("一ヶ月", "いっかげつ", "0:いっ;1:か;2:げつ");
+        await TestFuriganaAsync("一ヶ月", "いっかげつ", "0:いっ;1:か;2:げつ");
     }
 
     [TestMethod]
-    public void TestFuriganaObocchan()
+    public async Task TestFuriganaObocchanAsync()
     {
-        TestFurigana("御坊っちゃん", "おぼっちゃん", "0:お;1:ぼ");
+        await TestFuriganaAsync("御坊っちゃん", "おぼっちゃん", "0:お;1:ぼ");
     }
 
     [TestMethod]
     [Ignore]
-    public void TestFuriganaAra()
+    public async Task TestFuriganaAraAsync()
     {
         // Will fail. This is a weird kanji. The string containing only the kanji is Length == 2.
         // Would be cool to find a solution but don't worry too much about it.
-        TestFurigana("𩺊", "あら", "0:あら");
+        await TestFuriganaAsync("𩺊", "あら", "0:あら");
     }
 
     [TestMethod]
-    public void TestFuriganaIjirimawasu()
+    public async Task TestFuriganaIjirimawasuAsync()
     {
-        TestFurigana("弄り回す", "いじりまわす", "0:いじ;2:まわ");
+        await TestFuriganaAsync("弄り回す", "いじりまわす", "0:いじ;2:まわ");
     }
 
     [TestMethod]
-    public void TestFuriganaKassarau()
+    public async Task TestFuriganaKassarauAsync()
     {
-        TestFurigana("掻っ攫う", "かっさらう", "0:か;2:さら");
+        await TestFuriganaAsync("掻っ攫う", "かっさらう", "0:か;2:さら");
     }
 
     [TestMethod]
-    public void TestFuriganaOneesan()
+    public async Task TestFuriganaOneesanAsync()
     {
-        TestFurigana("御姉さん", "おねえさん", "0:お;1:ねえ");
+        await TestFuriganaAsync("御姉さん", "おねえさん", "0:お;1:ねえ");
     }
 
     [TestMethod]
-    public void TestFuriganaHakabakashii()
+    public async Task TestFuriganaHakabakashiiAsync()
     {
-        TestFurigana("捗捗しい", "はかばかしい", "0:はか;1:ばか");
+        await TestFuriganaAsync("捗捗しい", "はかばかしい", "0:はか;1:ばか");
     }
 
     [TestMethod]
-    public void TestFuriganaIssue5()
+    public async Task TestFuriganaIssue5Async()
     {
-        TestFurigana("御兄さん", "おにいさん", "0:お;1:にい");
-        TestFurigana("御姉さん", "おねえさん", "0:お;1:ねえ");
-        TestFurigana("御母さん", "おかあさん", "0:お;1:かあ");
-        TestFurigana("抑抑", "そもそも", "0:そも;1:そも");
-        TestFurigana("犇犇", "ひしひし", "0:ひし;1:ひし");
-        TestFurigana("険しい路", "けわしいみち", "0:けわ;3:みち");
-        TestFurigana("芝生", "しばふ", "0-1:しばふ");
-        TestFurigana("純日本風", "じゅんにほんふう", "0:じゅん;1-2:にほん;3:ふう");
-        TestFurigana("真珠湾", "しんじゅわん", "0:しん;1:じゅ;2:わん");
-        TestFurigana("草履", "ぞうり", "0-1:ぞうり");
-        TestFurigana("大和魂", "やまとだましい", "0-1:やまと;2:だましい");
-        TestFurigana("竹刀", "しない", "0-1:しない");
-        TestFurigana("東京湾", "とうきょうわん", "0:とう;1:きょう;2:わん");
-        TestFurigana("日本学者", "にほんがくしゃ", "0-1:にほん;2:がく;3:しゃ");
-        TestFurigana("日本製", "にほんせい", "0-1:にほん;2:せい");
-        TestFurigana("日本側", "にほんがわ", "0-1:にほん;2:がわ");
-        TestFurigana("日本刀", "にほんとう", "0-1:にほん;2:とう");
-        TestFurigana("日本風", "にほんふう", "0-1:にほん;2:ふう");
-        TestFurigana("木ノ葉", "このは", "0:こ;2:は");
-        TestFurigana("木ノ葉", "きのは", "0:き;2:は");
-        TestFurigana("余所見", "よそみ", "0:よ;1:そ;2:み");
-        TestFurigana("嗹", "れん", "0:れん");
-        TestFurigana("愈愈", "いよいよ", "0:いよ;1:いよ");
-        TestFurigana("偶偶", "たまたま", "0:たま;1:たま");
-        TestFurigana("益益", "ますます", "0:ます;1:ます");
-        TestFurigana("風邪薬", "かぜぐすり", "0-1:かぜ;2:ぐすり");
-        TestFurigana("日独協会", "にちどくきょうかい", "0:にち;1:どく;2:きょう;3:かい");
+        var testData = new List<(string, string, string)>
+        {
+            ("御兄さん", "おにいさん", "0:お;1:にい"),
+            ("御姉さん", "おねえさん", "0:お;1:ねえ"),
+            ("御母さん", "おかあさん", "0:お;1:かあ"),
+            ("抑抑", "そもそも", "0:そも;1:そも"),
+            ("犇犇", "ひしひし", "0:ひし;1:ひし"),
+            ("険しい路", "けわしいみち", "0:けわ;3:みち"),
+            ("芝生", "しばふ", "0-1:しばふ"),
+            ("純日本風", "じゅんにほんふう", "0:じゅん;1-2:にほん;3:ふう"),
+            ("真珠湾", "しんじゅわん", "0:しん;1:じゅ;2:わん"),
+            ("草履", "ぞうり", "0-1:ぞうり"),
+            ("大和魂", "やまとだましい", "0-1:やまと;2:だましい"),
+            ("竹刀", "しない", "0-1:しない"),
+            ("東京湾", "とうきょうわん", "0:とう;1:きょう;2:わん"),
+            ("日本学者", "にほんがくしゃ", "0-1:にほん;2:がく;3:しゃ"),
+            ("日本製", "にほんせい", "0-1:にほん;2:せい"),
+            ("日本側", "にほんがわ", "0-1:にほん;2:がわ"),
+            ("日本刀", "にほんとう", "0-1:にほん;2:とう"),
+            ("日本風", "にほんふう", "0-1:にほん;2:ふう"),
+            ("木ノ葉", "このは", "0:こ;2:は"),
+            ("木ノ葉", "きのは", "0:き;2:は"),
+            ("余所見", "よそみ", "0:よ;1:そ;2:み"),
+            ("嗹", "れん", "0:れん"),
+            ("愈愈", "いよいよ", "0:いよ;1:いよ"),
+            ("偶偶", "たまたま", "0:たま;1:たま"),
+            ("益益", "ますます", "0:ます;1:ます"),
+            ("風邪薬", "かぜぐすり", "0-1:かぜ;2:ぐすり"),
+            ("日独協会", "にちどくきょうかい", "0:にち;1:どく;2:きょう;3:かい"),
+        };
+        foreach (var x in testData)
+        {
+            await TestFuriganaAsync(x.Item1, x.Item2, x.Item3);
+        }
     }
 
-    public async static void TestFurigana(string kanjiReading, string kanaReading, string expectedFurigana)
+    public async static Task TestFuriganaAsync(string kanjiReading, string kanaReading, string expectedFurigana)
     {
         var v = new VocabEntry(kanjiReading, kanaReading);
         var resourceSet = new FuriganaResourceSet();
