@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using JmdictFurigana.Business;
@@ -80,7 +78,7 @@ public class FuriganaTest
     [TestMethod]
     public void TestFuriganaIssue5()
     {
-        var testData = new List<(string, string, string)>
+        var testData = new[]
         {
             ("御兄さん", "おにいさん", "0:お;1:にい"),
             ("御姉さん", "おねえさん", "0:お;1:ねえ"),
