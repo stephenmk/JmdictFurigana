@@ -47,7 +47,7 @@ class FuriganaFileWriter(string outputPath)
         await using (var jsonStream = new StreamWriter(jsonFilePath, false, Encoding.UTF8))
         await using (var jsonWriter = new JsonTextWriter(jsonStream))
         {
-            jsonWriter.WriteStartArray();
+            await jsonWriter.WriteStartArrayAsync();
             var jsonSerializer = new JsonSerializer();
             jsonSerializer.Converters.Add(new FuriganaSolutionJsonSerializer());
             await foreach (var solution in solutions)
