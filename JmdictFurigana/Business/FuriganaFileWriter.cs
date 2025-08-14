@@ -17,18 +17,8 @@ namespace JmdictFurigana.Business;
 /// </summary>
 class FuriganaFileWriter(string outputPath)
 {
-    /// <summary>
-    /// Gets or sets the value defining whether to write or not words for which a valid
-    /// furigana string could not be determined.
-    /// </summary>
-    public bool WriteUnsuccessfulWords { get; set; }
-
-    public HashSet<string> AlreadyWritten { get; set; } = [];
-
-    /// <summary>
-    /// Gets or sets the path where the file is written.
-    /// </summary>
-    public string OutputPath { get; set; } = outputPath;
+    private readonly string OutputPath = outputPath;
+    private readonly HashSet<string> AlreadyWritten = [];
 
     public async Task WriteAsync(IAsyncEnumerable<FuriganaSolutionSet> solutions)
     {
