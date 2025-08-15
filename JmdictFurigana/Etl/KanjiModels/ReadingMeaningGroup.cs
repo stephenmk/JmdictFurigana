@@ -13,31 +13,37 @@ public class ReadingMeaningGroup
     public async static Task<ReadingMeaningGroup> FromXmlAsync(XmlReader reader)
     {
         var group = new ReadingMeaningGroup();
+        var exit = false;
         string currentTagName;
-        while (await reader.ReadAsync())
+
+        while (!exit && await reader.ReadAsync())
         {
-            if (reader.NodeType == XmlNodeType.Element)
+            switch (reader.NodeType)
             {
-                currentTagName = reader.Name;
-                if (currentTagName == Reading.XmlTagName)
-                {
-                    var reading = await Reading.FromXmlAsync(reader);
-                    group.Readings.Add(reading);
-                }
-                else if (currentTagName == Meaning.XmlTagName)
-                {
-                    var meaning = await Meaning.FromXmlAsync(reader);
-                    group.Meanings.Add(meaning);
-                }
-            }
-            else if (reader.NodeType == XmlNodeType.EndElement)
-            {
-                if (reader.Name == XmlTagName)
-                {
+                case XmlNodeType.Element:
+                    currentTagName = reader.Name;
+                    await ProcessElementAsync(reader, currentTagName, group);
                     break;
-                }
+                case XmlNodeType.EndElement:
+                    exit = reader.Name == XmlTagName;
+                    break;
             }
         }
         return group;
+    }
+
+    private async static Task ProcessElementAsync(XmlReader reader, string tagName, ReadingMeaningGroup group)
+    {
+        switch (tagName)
+        {
+            case Reading.XmlTagName:
+                var reading = await Reading.FromXmlAsync(reader);
+                group.Readings.Add(reading);
+                break;
+            case Meaning.XmlTagName:
+                var meaning = await Meaning.FromXmlAsync(reader);
+                group.Meanings.Add(meaning);
+                break;
+        }
     }
 }

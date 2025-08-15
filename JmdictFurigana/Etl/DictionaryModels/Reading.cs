@@ -17,42 +17,55 @@ public class Reading
     public async static Task<Reading> FromXmlAsync(XmlReader reader, DocumentMetadata docMeta)
     {
         var reading = new Reading();
+        var exit = false;
         string currentTagName = XmlTagName;
-        while (await reader.ReadAsync())
+
+        while (!exit && await reader.ReadAsync())
         {
-            if (reader.NodeType == XmlNodeType.Element)
+            switch (reader.NodeType)
             {
-                currentTagName = reader.Name;
-                if (currentTagName == "re_nokanji")
-                {
-                    reading.NoKanji = true;
-                }
-            }
-            else if (reader.NodeType == XmlNodeType.Text)
-            {
-                var text = await reader.GetValueAsync();
-                if (currentTagName == "reb")
-                {
-                    reading.Text = text;
-                }
-                else if (currentTagName == "re_inf")
-                {
-                    var tag = docMeta.EntityValueToName[text];
-                    reading.InfoTags.Add(tag);
-                }
-                else if (currentTagName == "re_restr")
-                {
-                    reading.ConstraintKanjiFormTexts.Add(text);
-                }
-            }
-            else if (reader.NodeType == XmlNodeType.EndElement)
-            {
-                if (reader.Name == XmlTagName)
-                {
+                case XmlNodeType.Element:
+                    currentTagName = reader.Name;
+                    ProcessElement(currentTagName, reading);
                     break;
-                }
+                case XmlNodeType.Text:
+                    await ProcessTextAsync(reader, docMeta, currentTagName, reading);
+                    break;
+                case XmlNodeType.EndElement:
+                    exit = reader.Name == XmlTagName;
+                    break;
             }
         }
         return reading;
+    }
+
+    private static void ProcessElement(string tagName, Reading reading)
+    {
+        switch(tagName)
+        {
+            case "re_nokanji":
+                reading.NoKanji = true;
+                break;
+            // Potentially more cases here later.
+        }
+    }
+
+    private async static Task ProcessTextAsync(XmlReader reader, DocumentMetadata docMeta, string tagName, Reading reading)
+    {
+        switch(tagName)
+        {
+            case "reb":
+                reading.Text = await reader.GetValueAsync();
+                break;
+            case "re_inf":
+                var infoValue = await reader.GetValueAsync();
+                var infoName = docMeta.EntityValueToName[infoValue];
+                reading.InfoTags.Add(infoName);
+                break;
+            case "re_restr":
+                var kanjiFormText = await reader.GetValueAsync();
+                reading.ConstraintKanjiFormTexts.Add(kanjiFormText);
+                break;
+        }
     }
 }

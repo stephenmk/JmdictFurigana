@@ -13,32 +13,31 @@ public class ReadingMeaning
     public async static Task<ReadingMeaning> FromXmlAsync(XmlReader reader)
     {
         var readingMeaning = new ReadingMeaning();
+        var exit = false;
         string currentTagName = XmlTagName;
-        while (await reader.ReadAsync())
+
+        while (!exit && await reader.ReadAsync())
         {
-            if (reader.NodeType == XmlNodeType.Element)
+            switch (reader.NodeType)
             {
-                currentTagName = reader.Name;
-                if (currentTagName == "rmgroup")
-                {
-                    var group = await ReadingMeaningGroup.FromXmlAsync(reader);
-                    readingMeaning.Groups.Add(group);
-                }
-            }
-            else if (reader.NodeType == XmlNodeType.Text)
-            {
-                if (currentTagName == "nanori")
-                {
-                    var text = await reader.GetValueAsync();
-                    readingMeaning.Nanori.Add(text);
-                }
-            }
-            else if (reader.NodeType == XmlNodeType.EndElement)
-            {
-                if (reader.Name == XmlTagName)
-                {
+                case XmlNodeType.Element:
+                    currentTagName = reader.Name;
+                    if (currentTagName == "rmgroup")
+                    {
+                        var group = await ReadingMeaningGroup.FromXmlAsync(reader);
+                        readingMeaning.Groups.Add(group);
+                    }
                     break;
-                }
+                case XmlNodeType.Text:
+                    if (currentTagName == "nanori")
+                    {
+                        var text = await reader.GetValueAsync();
+                        readingMeaning.Nanori.Add(text);
+                    }
+                    break;
+                case XmlNodeType.EndElement:
+                    exit = reader.Name == XmlTagName;
+                    break;
             }
         }
         return readingMeaning;

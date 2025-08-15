@@ -15,34 +15,39 @@ public class KanjiForm
     public async static Task<KanjiForm> FromXmlAsync(XmlReader reader, DocumentMetadata docMeta)
     {
         var kanjiForm = new KanjiForm();
+        var exit = false;
         string currentTagName = XmlTagName;
-        while (await reader.ReadAsync())
+
+        while (!exit && await reader.ReadAsync())
         {
-            if (reader.NodeType == XmlNodeType.Element)
+            switch (reader.NodeType)
             {
-                currentTagName = reader.Name;
-            }
-            else if (reader.NodeType == XmlNodeType.Text)
-            {
-                var text = await reader.GetValueAsync();
-                if (currentTagName == "keb")
-                {
-                    kanjiForm.Text = text;
-                }
-                else if (currentTagName == "ke_inf")
-                {
-                    var tag = docMeta.EntityValueToName[text];
-                    kanjiForm.InfoTags.Add(tag);
-                }
-            }
-            else if (reader.NodeType == XmlNodeType.EndElement)
-            {
-                if (reader.Name == XmlTagName)
-                {
+                case XmlNodeType.Element:
+                    currentTagName = reader.Name;
                     break;
-                }
+                case XmlNodeType.Text:
+                    await ProcessTextAsync(reader, docMeta, currentTagName, kanjiForm);
+                    break;
+                case XmlNodeType.EndElement:
+                    exit = reader.Name == XmlTagName;
+                    break;
             }
         }
         return kanjiForm;
+    }
+
+    private async static Task ProcessTextAsync(XmlReader reader, DocumentMetadata docMeta, string tagName, KanjiForm kanjiForm)
+    {
+        switch(tagName)
+        {
+            case "keb":
+                kanjiForm.Text = await reader.GetValueAsync();
+                break;
+            case "ke_inf":
+                var infoValue = await reader.GetValueAsync();
+                var infoName = docMeta.EntityValueToName[infoValue];
+                kanjiForm.InfoTags.Add(infoName);
+                break;
+        }
     }
 }

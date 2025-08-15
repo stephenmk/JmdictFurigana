@@ -15,27 +15,25 @@ public class Meaning
         {
             Language = reader.GetAttribute("m_lang") ?? "en"
         };
-
+        var exit = false;
         string currentTagName = XmlTagName;
-        while (await reader.ReadAsync())
+
+        while (!exit && await reader.ReadAsync())
         {
-            if (reader.NodeType == XmlNodeType.Element)
+            switch (reader.NodeType)
             {
-                currentTagName = reader.Name;
-            }
-            else if (reader.NodeType == XmlNodeType.Text)
-            {
-                if (currentTagName == XmlTagName)
-                {
-                    meaning.Text = await reader.GetValueAsync();
-                }
-            }
-            else if (reader.NodeType == XmlNodeType.EndElement)
-            {
-                if (reader.Name == XmlTagName)
-                {
+                case XmlNodeType.Element:
+                    currentTagName = reader.Name;
                     break;
-                }
+                case XmlNodeType.Text:
+                    if (currentTagName == XmlTagName)
+                    {
+                        meaning.Text = await reader.GetValueAsync();
+                    }
+                    break;
+                case XmlNodeType.EndElement:
+                    exit = reader.Name == XmlTagName;
+                    break;
             }
         }
         return meaning;

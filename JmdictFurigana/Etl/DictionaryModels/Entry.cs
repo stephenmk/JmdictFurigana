@@ -25,10 +25,7 @@ public class Entry
                     await ProcessElementAsync(reader, docMeta, currentTagName, entry);
                     break;
                 case XmlNodeType.EndElement:
-                    if (reader.Name == XmlTagName)
-                    {
-                        exit = true;
-                    }
+                    exit = reader.Name == XmlTagName;
                     break;
             }
         }

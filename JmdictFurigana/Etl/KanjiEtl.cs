@@ -95,13 +95,16 @@ public class KanjiEtl
 
         while (await reader.ReadAsync())
         {
-            if (reader.NodeType == XmlNodeType.Element)
+            switch (reader.NodeType)
             {
-                if (reader.Name == Entry.XmlTagName)
-                {
-                    var entry = await Entry.FromXmlAsync(reader);
-                    yield return entry;
-                }
+                case XmlNodeType.Element:
+                    if (reader.Name == Entry.XmlTagName)
+                    {
+                        var entry = await Entry.FromXmlAsync(reader);
+                        yield return entry;
+                    }
+                    break;
+                // Potentially more cases here later.
             }
         }
     }

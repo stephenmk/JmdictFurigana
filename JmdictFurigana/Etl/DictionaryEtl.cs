@@ -31,20 +31,21 @@ public partial class DictionaryEtl(string dictionaryFilePath)
 
         while (await reader.ReadAsync())
         {
-            if (reader.NodeType == XmlNodeType.DocumentType)
+            switch (reader.NodeType)
             {
-                docMeta = await DocumentMetadata.FromXmlAsync(reader);
-            }
-            else if (reader.NodeType == XmlNodeType.Element)
-            {
-                if (reader.Name == Entry.XmlTagName)
-                {
-                    var entry = await Entry.FromXmlAsync(reader, docMeta);
-                    foreach (var vocabEntry in VocabEntries(entry))
+                case XmlNodeType.DocumentType:
+                    docMeta = await DocumentMetadata.FromXmlAsync(reader);
+                    break;
+                case XmlNodeType.Element:
+                    if (reader.Name == Entry.XmlTagName)
                     {
-                        yield return vocabEntry;
+                        var entry = await Entry.FromXmlAsync(reader, docMeta);
+                        foreach (var vocabEntry in VocabEntries(entry))
+                        {
+                            yield return vocabEntry;
+                        }
                     }
-                }
+                    break;
             }
         }
     }
