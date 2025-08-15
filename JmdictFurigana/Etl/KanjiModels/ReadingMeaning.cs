@@ -8,26 +8,26 @@ public class ReadingMeaning
 {
     public List<ReadingMeaningGroup> Groups = [];
     public List<string> Nanori = [];
-    public static readonly string XmlElementName = "reading_meaning";
+    public const string XmlTagName = "reading_meaning";
 
-    public async static Task<ReadingMeaning> FromXmlReader(XmlReader reader)
+    public async static Task<ReadingMeaning> FromXmlAsync(XmlReader reader)
     {
         var readingMeaning = new ReadingMeaning();
-        string currentElementName = XmlElementName;
+        string currentTagName = XmlTagName;
         while (await reader.ReadAsync())
         {
             if (reader.NodeType == XmlNodeType.Element)
             {
-                currentElementName = reader.Name;
-                if (currentElementName == "rmgroup")
+                currentTagName = reader.Name;
+                if (currentTagName == "rmgroup")
                 {
-                    var group = await ReadingMeaningGroup.FromXmlReader(reader);
+                    var group = await ReadingMeaningGroup.FromXmlAsync(reader);
                     readingMeaning.Groups.Add(group);
                 }
             }
             else if (reader.NodeType == XmlNodeType.Text)
             {
-                if (currentElementName == "nanori")
+                if (currentTagName == "nanori")
                 {
                     var text = await reader.GetValueAsync();
                     readingMeaning.Nanori.Add(text);
@@ -35,7 +35,7 @@ public class ReadingMeaning
             }
             else if (reader.NodeType == XmlNodeType.EndElement)
             {
-                if (reader.Name == XmlElementName)
+                if (reader.Name == XmlTagName)
                 {
                     break;
                 }

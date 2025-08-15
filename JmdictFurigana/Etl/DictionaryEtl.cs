@@ -13,7 +13,7 @@ namespace JmdictFurigana.Etl;
 public partial class DictionaryEtl(string dictionaryFilePath)
 {
     public string DictionaryFilePath { get; set; } = dictionaryFilePath;
-    
+
     public async IAsyncEnumerable<VocabEntry> ExecuteAsync()
     {
         await using var stream = File.OpenRead(DictionaryFilePath);
@@ -33,13 +33,13 @@ public partial class DictionaryEtl(string dictionaryFilePath)
         {
             if (reader.NodeType == XmlNodeType.DocumentType)
             {
-                docMeta = await DocumentMetadata.FromXmlReader(reader);
+                docMeta = await DocumentMetadata.FromXmlAsync(reader);
             }
             else if (reader.NodeType == XmlNodeType.Element)
             {
-                if (reader.Name == Entry.XmlElementName)
+                if (reader.Name == Entry.XmlTagName)
                 {
-                    var entry = await Entry.FromXmlReader(reader, docMeta);
+                    var entry = await Entry.FromXmlAsync(reader, docMeta);
                     foreach (var vocabEntry in VocabEntries(entry))
                     {
                         yield return vocabEntry;

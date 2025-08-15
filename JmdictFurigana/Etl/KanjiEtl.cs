@@ -97,9 +97,9 @@ public class KanjiEtl
         {
             if (reader.NodeType == XmlNodeType.Element)
             {
-                if (reader.Name == Entry.XmlElementName)
+                if (reader.Name == Entry.XmlTagName)
                 {
-                    var entry = await Entry.FromXmlReader(reader);
+                    var entry = await Entry.FromXmlAsync(reader);
                     yield return entry;
                 }
             }

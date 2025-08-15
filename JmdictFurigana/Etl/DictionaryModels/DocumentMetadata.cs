@@ -10,7 +10,7 @@ public partial class DocumentMetadata
     public string Name;
     public Dictionary<string, string> EntityValueToName;
 
-    public async static Task<DocumentMetadata> FromXmlReader(XmlReader reader)
+    public async static Task<DocumentMetadata> FromXmlAsync(XmlReader reader)
     {
         var dtd = await reader.GetValueAsync();
         var documentMetadata = new DocumentMetadata
@@ -38,6 +38,8 @@ public partial class DocumentMetadata
             catch (System.ArgumentException)
             {
                 // The "ik" name is reused with the same value.
+                // As long as the Name/Value pair is the same,
+                // don't throw an exception.
                 if (valueToName[entityValue] != entityName)
                 {
                     throw;

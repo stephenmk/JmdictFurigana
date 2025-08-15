@@ -8,31 +8,31 @@ public class ReadingMeaningGroup
 {
     public List<Reading> Readings = [];
     public List<Meaning> Meanings = [];
-    public static readonly string XmlElementName = "rmgroup";
+    public const string XmlTagName = "rmgroup";
 
-    public async static Task<ReadingMeaningGroup> FromXmlReader(XmlReader reader)
+    public async static Task<ReadingMeaningGroup> FromXmlAsync(XmlReader reader)
     {
         var group = new ReadingMeaningGroup();
-        string currentElementName;
+        string currentTagName;
         while (await reader.ReadAsync())
         {
             if (reader.NodeType == XmlNodeType.Element)
             {
-                currentElementName = reader.Name;
-                if (currentElementName == Reading.XmlElementName)
+                currentTagName = reader.Name;
+                if (currentTagName == Reading.XmlTagName)
                 {
-                    var reading = await Reading.FromXmlReader(reader);
+                    var reading = await Reading.FromXmlAsync(reader);
                     group.Readings.Add(reading);
                 }
-                else if (currentElementName == Meaning.XmlElementName)
+                else if (currentTagName == Meaning.XmlTagName)
                 {
-                    var meaning = await Meaning.FromXmlReader(reader);
+                    var meaning = await Meaning.FromXmlAsync(reader);
                     group.Meanings.Add(meaning);
                 }
             }
             else if (reader.NodeType == XmlNodeType.EndElement)
             {
-                if (reader.Name == XmlElementName)
+                if (reader.Name == XmlTagName)
                 {
                     break;
                 }

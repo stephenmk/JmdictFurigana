@@ -8,7 +8,7 @@ public class Reading
 {
     public string Text;
     public ReadingType Type;
-    public static readonly string XmlElementName = "reading";
+    public const string XmlTagName = "reading";
     public bool IsJapanese => Type == ReadingType.JapaneseOn || Type == ReadingType.JapaneseKun;
     private static readonly Dictionary<string, ReadingType> AttributeToType = new()
     {
@@ -20,30 +20,30 @@ public class Reading
         ["ja_kun"] = ReadingType.JapaneseKun,
     };
 
-    public async static Task<Reading> FromXmlReader(XmlReader reader)
+    public async static Task<Reading> FromXmlAsync(XmlReader reader)
     {
         var reading = new Reading()
         {
             Type = AttributeToType[reader.GetAttribute("r_type")]
         };
-        
-        string currentElementName = XmlElementName;
+
+        string currentTagName = XmlTagName;
         while (await reader.ReadAsync())
         {
             if (reader.NodeType == XmlNodeType.Element)
             {
-                currentElementName = reader.Name;
+                currentTagName = reader.Name;
             }
             else if (reader.NodeType == XmlNodeType.Text)
             {
-                if (currentElementName == XmlElementName)
+                if (currentTagName == XmlTagName)
                 {
                     reading.Text = await reader.GetValueAsync();
                 }
             }
             else if (reader.NodeType == XmlNodeType.EndElement)
             {
-                if (reader.Name == XmlElementName)
+                if (reader.Name == XmlTagName)
                 {
                     break;
                 }

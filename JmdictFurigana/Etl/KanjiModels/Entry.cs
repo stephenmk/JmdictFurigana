@@ -7,32 +7,32 @@ public class Entry
 {
     public string Literal;
     public ReadingMeaning ReadingMeaning;
-    public static readonly string XmlElementName = "character";
+    public const string XmlTagName = "character";
 
-    public async static Task<Entry> FromXmlReader(XmlReader reader)
+    public async static Task<Entry> FromXmlAsync(XmlReader reader)
     {
         var entry = new Entry();
-        string currentElementName = XmlElementName;
+        string currentTagName = XmlTagName;
         while (await reader.ReadAsync())
         {
             if (reader.NodeType == XmlNodeType.Element)
             {
-                currentElementName = reader.Name;
-                if (currentElementName == ReadingMeaning.XmlElementName)
+                currentTagName = reader.Name;
+                if (currentTagName == ReadingMeaning.XmlTagName)
                 {
-                    entry.ReadingMeaning = await ReadingMeaning.FromXmlReader(reader);
+                    entry.ReadingMeaning = await ReadingMeaning.FromXmlAsync(reader);
                 }
             }
             else if (reader.NodeType == XmlNodeType.Text)
             {
-                if (currentElementName == "literal")
+                if (currentTagName == "literal")
                 {
                     entry.Literal = await reader.GetValueAsync();
                 }
             }
             else if (reader.NodeType == XmlNodeType.EndElement)
             {
-                if (reader.Name == XmlElementName)
+                if (reader.Name == XmlTagName)
                 {
                     break;
                 }

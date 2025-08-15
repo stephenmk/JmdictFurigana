@@ -8,36 +8,45 @@ public class Entry
 {
     public List<KanjiForm> KanjiForms = [];
     public List<Reading> Readings = [];
-    public static readonly string XmlElementName = "entry";
+    public const string XmlTagName = "entry";
 
-    public async static Task<Entry> FromXmlReader(XmlReader reader, DocumentMetadata docMeta)
+    public async static Task<Entry> FromXmlAsync(XmlReader reader, DocumentMetadata docMeta)
     {
         var entry = new Entry();
-        string currentElementName;
-        while (await reader.ReadAsync())
+        var exit = false;
+        string currentTagName;
+
+        while (!exit && await reader.ReadAsync())
         {
-            if (reader.NodeType == XmlNodeType.Element)
+            switch (reader.NodeType)
             {
-                currentElementName = reader.Name;
-                if (currentElementName == KanjiForm.XmlElementName)
-                {
-                    var kanjiForm = await KanjiForm.FromXmlReader(reader, docMeta);
-                    entry.KanjiForms.Add(kanjiForm);
-                }
-                else if (currentElementName == Reading.XmlElementName)
-                {
-                    var reading = await Reading.FromXmlReader(reader, docMeta);
-                    entry.Readings.Add(reading);
-                }
-            }
-            else if (reader.NodeType == XmlNodeType.EndElement)
-            {
-                if (reader.Name == XmlElementName)
-                {
+                case XmlNodeType.Element:
+                    currentTagName = reader.Name;
+                    await ProcessElementAsync(reader, docMeta, currentTagName, entry);
                     break;
-                }
+                case XmlNodeType.EndElement:
+                    if (reader.Name == XmlTagName)
+                    {
+                        exit = true;
+                    }
+                    break;
             }
         }
         return entry;
+    }
+
+    private async static Task ProcessElementAsync(XmlReader reader, DocumentMetadata docMeta, string tagName, Entry entry)
+    {
+        switch (tagName)
+        {
+            case KanjiForm.XmlTagName:
+                var kanjiForm = await KanjiForm.FromXmlAsync(reader, docMeta);
+                entry.KanjiForms.Add(kanjiForm);
+                break;
+            case Reading.XmlTagName:
+                var reading = await Reading.FromXmlAsync(reader, docMeta);
+                entry.Readings.Add(reading);
+                break;
+        }
     }
 }

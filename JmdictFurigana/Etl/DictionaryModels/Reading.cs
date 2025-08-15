@@ -12,18 +12,18 @@ public class Reading
     public List<string> ConstraintKanjiFormTexts = [];
     public bool NoKanji = false;
     public bool IsHidden => InfoTags.Any(tag => tag == "sk");
-    public static readonly string XmlElementName = "r_ele";
+    public const string XmlTagName = "r_ele";
 
-    public async static Task<Reading> FromXmlReader(XmlReader reader, DocumentMetadata docMeta)
+    public async static Task<Reading> FromXmlAsync(XmlReader reader, DocumentMetadata docMeta)
     {
         var reading = new Reading();
-        string currentElementName = XmlElementName;
+        string currentTagName = XmlTagName;
         while (await reader.ReadAsync())
         {
             if (reader.NodeType == XmlNodeType.Element)
             {
-                currentElementName = reader.Name;
-                if (currentElementName == "re_nokanji")
+                currentTagName = reader.Name;
+                if (currentTagName == "re_nokanji")
                 {
                     reading.NoKanji = true;
                 }
@@ -31,23 +31,23 @@ public class Reading
             else if (reader.NodeType == XmlNodeType.Text)
             {
                 var text = await reader.GetValueAsync();
-                if (currentElementName == "reb")
+                if (currentTagName == "reb")
                 {
                     reading.Text = text;
                 }
-                else if (currentElementName == "re_inf")
+                else if (currentTagName == "re_inf")
                 {
                     var tag = docMeta.EntityValueToName[text];
                     reading.InfoTags.Add(tag);
                 }
-                else if (currentElementName == "re_restr")
+                else if (currentTagName == "re_restr")
                 {
                     reading.ConstraintKanjiFormTexts.Add(text);
                 }
             }
             else if (reader.NodeType == XmlNodeType.EndElement)
             {
-                if (reader.Name == XmlElementName)
+                if (reader.Name == XmlTagName)
                 {
                     break;
                 }
