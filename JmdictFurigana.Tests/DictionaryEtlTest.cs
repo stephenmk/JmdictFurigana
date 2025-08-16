@@ -10,7 +10,7 @@ namespace JmdictFurigana.Tests;
 public class DictionaryEtlTest
 {
     [TestMethod]
-    public async Task ExecuteTestWaruguchiFourReadings()
+    public async Task ExecuteTestWaruguchiReadings()
     {
         /*
             `Waruguchi.xml` contains an entry with the following forms and info tags:
