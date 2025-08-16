@@ -12,7 +12,7 @@ public static class ListExtensions
     /// <typeparam name="T">List type.</typeparam>
     /// <param name="list">List to clone.</param>
     /// <returns>List containing cloned instances of the input.</returns>
-    public static List<T> Clone<T>(this List<T> list) where T: ICloneable
+    public static List<T> Clone<T>(this List<T> list) where T : ICloneable
     {
         return list.Select(item => (T)item.Clone()).ToList();
     }

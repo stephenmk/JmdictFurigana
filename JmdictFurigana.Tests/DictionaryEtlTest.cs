@@ -45,7 +45,7 @@ public class DictionaryEtlTest
         var dictionaryEtl = new DictionaryEtl(dictionaryFilePath);
         var results = new List<string>();
 
-        await foreach(var vocabEntry in dictionaryEtl.ExecuteAsync())
+        await foreach (var vocabEntry in dictionaryEtl.ExecuteAsync())
         {
             results.Add(vocabEntry.ToString());
         }

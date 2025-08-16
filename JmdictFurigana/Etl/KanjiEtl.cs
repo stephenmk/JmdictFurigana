@@ -104,7 +104,7 @@ public class KanjiEtl
                         yield return entry;
                     }
                     break;
-                // Potentially more cases here later.
+                    // Potentially more cases here later.
             }
         }
     }

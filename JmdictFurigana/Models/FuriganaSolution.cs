@@ -118,7 +118,7 @@ public class FuriganaSolution(VocabEntry vocab, List<FuriganaPart> furigana)
         // 2. All non-kana characters are covered by a furigana part.
         // 3. Reconstituting the kana reading from the kanji reading using the furigana parts when
         // available will give the kana reading of the vocab entry.
-        
+
         // Keep in mind things like 真っ青 admit a correct "0-2:まっさお" solution. There can be
         // furigana parts covering kana.
 

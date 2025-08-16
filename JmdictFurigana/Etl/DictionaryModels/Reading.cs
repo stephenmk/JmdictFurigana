@@ -41,18 +41,18 @@ public class Reading
 
     private static void ProcessElement(string tagName, Reading reading)
     {
-        switch(tagName)
+        switch (tagName)
         {
             case "re_nokanji":
                 reading.NoKanji = true;
                 break;
-            // Potentially more cases here later.
+                // Potentially more cases here later.
         }
     }
 
     private async static Task ProcessTextAsync(XmlReader reader, DocumentMetadata docMeta, string tagName, Reading reading)
     {
-        switch(tagName)
+        switch (tagName)
         {
             case "reb":
                 reading.Text = await reader.GetValueAsync();

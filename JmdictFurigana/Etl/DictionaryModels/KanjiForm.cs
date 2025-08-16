@@ -38,7 +38,7 @@ public class KanjiForm
 
     private async static Task ProcessTextAsync(XmlReader reader, DocumentMetadata docMeta, string tagName, KanjiForm kanjiForm)
     {
-        switch(tagName)
+        switch (tagName)
         {
             case "keb":
                 kanjiForm.Text = await reader.GetValueAsync();
