@@ -45,6 +45,8 @@ Temporary Items
 # Custom
 JmdictFurigana/bin
 JmdictFurigana/obj
+JmdictFurigana/Output
+JmdictFurigana/Resources/*.xml
 JmdictFurigana.Tests/bin
 JmdictFurigana.Tests/obj
 TestResults
